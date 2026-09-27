@@ -1,2167 +1,1380 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DentaViz — Dental Treatment Visualization</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dental Chart</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-:root{
-  --bg:#07090f;--sf:#0f1420;--sf2:#161e2e;--sf3:#1c2538;--sf4:#232f47;
-  --ac:#4f8ff7;--ac2:#0d1a30;--acs:#7db3ff;--acg:#3b82f6;
-  --dg:#f43f5e;--wn:#f59e0b;--ok:#10d9a0;--pu:#a78bfa;--cy:#06b6d4;
-  --bd:#1a2540;--bd2:#243358;--bd3:#2e4070;
-  --t1:#eef2ff;--t2:#9aaac8;--t3:#5f6e8a;--t4:#3d4e68;
-  --mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif;
-  --r:12px;--r2:8px;--r3:6px
+:root {
+  --bg:            #f5f7fb;
+  --surface:       #ffffff;
+  --surface2:      #eef2f9;
+  --border:        #dde4ef;
+  --border2:       #c8d4e8;
+  --text-primary:  #111827;
+  --text-secondary:#4b5a72;
+  --text-muted:    #8b9ab8;
+  --accent:        #2563eb;
+  --accent-dim:    rgba(37,99,235,.1);
+  --accent-ring:   rgba(37,99,235,.25);
+
+  --sound:         #16a34a;
+  --caries:        #dc2626;
+  --restored:      #d97706;
+  --crown:         #7c3aed;
+  --missing:       #64748b;
+  --implant:       #0891b2;
+  --unerupted:     #94a3b8;
+  --watch:         #ea580c;
+
+  color-scheme: light;
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:13px}
-#app{display:grid;grid-template-rows:50px 1fr 28px;height:100vh}
 
-/* ── HEADER ── */
-#hdr{display:flex;align-items:center;padding:0 16px;gap:0;background:rgba(15,20,32,.96);border-bottom:1px solid var(--bd);backdrop-filter:blur(16px);z-index:20;position:relative}
-#hdr::after{content:'';position:absolute;inset-x:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(79,143,247,.4),transparent)}
-.logo{display:flex;align-items:center;gap:8px;margin-right:20px;flex-shrink:0}
-.logo-gem{width:28px;height:28px}
-.logo-gem svg{width:100%;height:100%;filter:drop-shadow(0 0 8px rgba(79,143,247,.5))}
-.logo-text{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--t1)}
-.logo-text span{color:var(--acs)}
-.logo-sub{font-size:8px;font-weight:600;color:var(--t4);letter-spacing:.12em;text-transform:uppercase;line-height:1}
-.hsp{flex:1}
-.nav{display:flex;gap:1px;height:100%}
-.ntab{padding:0 14px;height:100%;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap;user-select:none}
-.ntab:hover{color:var(--t2)}
-.ntab.on{color:var(--acs);border-bottom-color:var(--ac)}
-.ntab svg{width:13px;height:13px;flex-shrink:0}
-.hbtn{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:6px 12px;border-radius:var(--r2);border:1px solid var(--bd2);background:var(--sf2);color:var(--t2);cursor:pointer;transition:.15s;font-family:var(--sans);margin-left:7px;white-space:nowrap}
-.hbtn:hover{color:var(--t1);background:var(--sf3);border-color:var(--bd3)}
-.hbtn svg{width:12px;height:12px}
-.hbtn.blue{background:linear-gradient(135deg,var(--ac),var(--acg));border-color:transparent;color:#fff;box-shadow:0 2px 14px rgba(79,143,247,.3)}
-.hbtn.blue:hover{filter:brightness(1.1)}
-.changepill{font-size:11px;font-weight:700;font-family:var(--mono);padding:5px 10px;border-radius:var(--r2);background:var(--ac2);color:var(--acs);border:1px solid rgba(79,143,247,.2);margin-left:7px}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:            #0d1421;
+    --surface:       #131d30;
+    --surface2:      #1a2640;
+    --border:        #253348;
+    --border2:       #344660;
+    --text-primary:  #e8edf8;
+    --text-secondary:#8b9ab8;
+    --text-muted:    #506070;
+    --accent:        #4f8ff7;
+    --accent-dim:    rgba(79,143,247,.14);
+    --accent-ring:   rgba(79,143,247,.3);
+    color-scheme: dark;
+  }
+}
 
-/* ── BODY ── */
-#body{display:grid;grid-template-columns:1fr 288px;overflow:hidden}
+:root[data-theme="dark"] {
+  --bg:            #0d1421;
+  --surface:       #131d30;
+  --surface2:      #1a2640;
+  --border:        #253348;
+  --border2:       #344660;
+  --text-primary:  #e8edf8;
+  --text-secondary:#8b9ab8;
+  --text-muted:    #506070;
+  --accent:        #4f8ff7;
+  --accent-dim:    rgba(79,143,247,.14);
+  --accent-ring:   rgba(79,143,247,.3);
+  color-scheme: dark;
+}
 
-/* ── VIEWPORT ── */
-#vp{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#111d38 0%,#07090f 68%)}
-#cv{display:block;width:100%;height:100%}
-.vp-fade-t{position:absolute;inset:0 0 auto;height:60px;background:linear-gradient(180deg,rgba(7,9,15,.45),transparent);pointer-events:none;z-index:2}
-.vp-fade-b{position:absolute;inset:auto 0 0;height:60px;background:linear-gradient(0deg,rgba(7,9,15,.45),transparent);pointer-events:none;z-index:2}
+*{box-sizing:border-box;margin:0;padding:0}
 
-/* Glass surface */
-.glass{backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);background:rgba(10,14,26,.78);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04)}
+body{
+  background:var(--bg);
+  color:var(--text-primary);
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:14px;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
 
-/* Loading overlay */
-#ld-overlay{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:var(--bg)}
-.ld-box{background:var(--sf);border:1px solid var(--bd2);border-radius:18px;padding:36px 40px;max-width:460px;width:100%}
-.ld-spinner{width:52px;height:52px;margin:0 auto 20px;position:relative}
-.ld-spinner svg{animation:spin 2.4s linear infinite;width:100%;height:100%}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ld-h{font-size:18px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#fff,#8fa8d0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.ld-p{font-size:12px;color:var(--t3);line-height:1.7;margin-bottom:24px}
-.ld-dropzone{border:1.5px dashed var(--bd3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:.2s;position:relative}
-.ld-dropzone:hover,.ld-dropzone.drag{border-color:var(--ac);background:rgba(79,143,247,.04)}
-.ld-dz-ic{width:42px;height:42px;margin:0 auto 12px;border-radius:10px;background:var(--ac2);display:grid;place-items:center;transition:.15s}
-.ld-dropzone:hover .ld-dz-ic{background:var(--ac)}
-.ld-dz-ic svg{width:20px;height:20px;color:var(--acs)}
-.ld-dropzone:hover .ld-dz-ic svg{color:#fff}
-.ld-dz-t{font-size:13px;font-weight:600;margin-bottom:4px}
-.ld-dz-s{font-size:11px;color:var(--t4)}
-#ld-file{display:none}
-.ld-divider{display:flex;align-items:center;gap:10px;color:var(--t4);font-size:11px;margin:16px 0}
-.ld-divider::before,.ld-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
-.ld-demo-btn{width:100%;padding:11px;border-radius:10px;border:1px solid var(--bd2);background:var(--sf2);color:var(--t2);font-size:12.5px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:7px}
-.ld-demo-btn:hover{border-color:var(--ac);color:var(--acs);background:var(--ac2)}
-.ld-demo-btn svg{width:14px;height:14px}
-.ld-progress{margin-top:18px;display:none}
-.ld-track{height:3px;background:var(--sf3);border-radius:2px;overflow:hidden}
-.ld-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--acs));width:0;transition:width .3s;border-radius:2px;box-shadow:0 0 8px var(--ac)}
-.ld-msg{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:8px}
-.ld-hint{font-size:11px;color:var(--t4);line-height:1.6;margin-top:16px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px}
-.ld-hint b{color:var(--t2)}
+/* ── Top bar ── */
+.topbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:10px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;background:var(--accent);border-radius:7px;
+  display:flex;align-items:center;justify-content:center}
+.logo svg{width:17px;height:17px;fill:#fff}
+.app-name{font-size:14px;font-weight:700;letter-spacing:-.01em}
+.patient-pill{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;padding:5px 12px;
+  display:flex;align-items:center;gap:10px;font-size:12px
+}
+.patient-pill .pname{font-weight:600}
+.patient-pill .pdob{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px}
+.tb-right{display:flex;gap:7px}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 13px;border-radius:6px;font-size:12px;font-weight:500;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text-secondary);cursor:pointer;transition:all .13s;font-family:inherit
+}
+.btn:hover{border-color:var(--border2);color:var(--text-primary)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{filter:brightness(1.08);color:#fff}
 
-/* Floating HUD – selected tooth */
-#hud{position:absolute;top:14px;left:14px;border-radius:var(--r);overflow:hidden;min-width:220px;display:none;z-index:5}
-.hud-top{padding:12px 14px 10px;background:linear-gradient(135deg,rgba(79,143,247,.1),transparent)}
-.hud-lbl{font-size:9px;font-weight:700;color:var(--t4);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:6px}
-.hud-lbl::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ac);box-shadow:0 0 6px var(--ac);flex-shrink:0}
-.hud-main{display:flex;align-items:baseline;gap:10px}
-.hud-fdi{font-size:36px;font-weight:200;font-family:var(--mono);line-height:.9;letter-spacing:-.04em;background:linear-gradient(135deg,#fff,#7a90b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hud-name{font-size:13px;font-weight:600;color:var(--t1)}
-.hud-arch{font-size:10px;color:var(--t3);margin-top:2px}
-.hud-body{padding:10px 14px;border-top:1px solid var(--bd)}
-.hud-row{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;margin-bottom:5px}
-.hud-row:last-child{margin-bottom:0}
-.hud-k{color:var(--t4);font-weight:500}
-.hud-v{font-weight:600;display:flex;align-items:center;gap:5px}
-.hud-dot{width:7px;height:7px;border-radius:50%}
+/* ── Layout ── */
+.shell{display:flex;flex:1;overflow:hidden;min-height:0}
 
-/* Model info badge */
-#badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);padding:7px 15px;border-radius:100px;display:none;align-items:center;gap:7px;font-size:11px;font-weight:600;font-family:var(--mono);color:var(--ok);white-space:nowrap;z-index:5}
-#badge .bd{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+/* ── Chart area ── */
+.chart-area{
+  flex:1;overflow:auto;
+  display:flex;flex-direction:column;
+  padding:16px 12px 10px;
+  gap:2px;
+  align-items:center;
+}
 
-/* View tools – right side of viewport */
-#vtools{position:absolute;top:14px;right:14px;border-radius:var(--r);padding:5px;display:flex;flex-direction:column;gap:2px;z-index:5}
-.vt{display:flex;align-items:center;gap:8px;padding:7px 11px;font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;border-radius:var(--r2);transition:.13s;user-select:none;min-width:120px}
-.vt:hover{color:var(--t1);background:rgba(255,255,255,.05)}
-.vt.on{color:var(--acs);background:rgba(79,143,247,.1)}
-.vt-ic{width:14px;height:14px;flex-shrink:0;opacity:.75}
-.vt.on .vt-ic{opacity:1}
-.vt-ic svg{width:100%;height:100%}
-.vtoggle{margin-left:auto;width:24px;height:14px;border-radius:100px;background:var(--sf3);position:relative;flex-shrink:0;transition:.15s}
-.vt.on .vtoggle{background:var(--ac)}
-.vtoggle::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-.vt.on .vtoggle::after{transform:translateX(10px)}
+.toolbar{
+  display:flex;align-items:center;justify-content:flex-end;
+  width:100%;max-width:820px;
+  gap:10px;margin-bottom:6px
+}
+.toggle-wrap{
+  display:flex;align-items:center;gap:7px;
+  font-size:12px;color:var(--text-secondary);cursor:pointer;user-select:none
+}
+.toggle{width:30px;height:17px;background:var(--border2);border-radius:9px;
+  position:relative;transition:background .18s;flex-shrink:0}
+.toggle::after{content:'';position:absolute;width:11px;height:11px;
+  border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .18s}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{transform:translateX(13px)}
 
-/* Camera dock */
-#camdock{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);padding:4px;border-radius:10px;display:flex;gap:2px;z-index:5}
-.cb{padding:7px 12px;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--t3);cursor:pointer;border-radius:var(--r2);transition:.13s;user-select:none;display:flex;align-items:center;gap:4px;letter-spacing:.04em}
-.cb:hover{color:var(--t1);background:rgba(255,255,255,.07)}
-.cb.on{color:var(--acs);background:rgba(79,143,247,.12)}
-.cb svg{width:12px;height:12px}
-.cb-div{width:1px;background:var(--bd);margin:4px 2px}
+.q-row{
+  display:flex;justify-content:center;width:100%;max-width:820px;
+}
+.q-row-inner{
+  display:grid;grid-template-columns:1fr 1fr;width:100%;
+}
+.q-label{
+  font-size:9.5px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-muted);
+  padding:0 6px;
+}
+.q-label.right{text-align:right}
+.q-label.left{text-align:left}
 
-/* BA slider */
-#ba-wrap{position:absolute;bottom:14px;right:14px;padding:10px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;z-index:5}
-.ba-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;transition:.2s}
-.ba-label.cur{color:var(--t2)}.ba-label.aft{color:var(--t4)}
-#ba-range{width:130px;accent-color:var(--ac);cursor:pointer;height:4px;-webkit-appearance:none;appearance:none;background:linear-gradient(90deg,var(--ac) 0%,var(--sf3) 0%);border-radius:3px}
-#ba-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4),0 0 0 3px var(--ac)}
-.ba-pct{font-size:11px;font-family:var(--mono);color:var(--acs);min-width:30px;text-align:right;font-weight:600}
+.arch-label{
+  font-size:10px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--text-muted);
+  text-align:center;padding:2px 0;width:100%;
+}
 
-/* Hover tooltip */
-#tip{position:absolute;pointer-events:none;display:none;z-index:40;overflow:hidden;min-width:175px;border-radius:10px}
-.tip-top{padding:9px 12px 7px;background:linear-gradient(135deg,rgba(79,143,247,.12),transparent)}
-.tip-fdi{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--t1)}
-.tip-nm{font-size:11px;color:var(--t2);margin-top:1px}
-.tip-body{padding:7px 12px;border-top:1px solid var(--bd);font-size:10.5px;display:flex;flex-direction:column;gap:3px}
-.tip-row{display:flex;justify-content:space-between;gap:12px}
-.tip-k{color:var(--t4)}.tip-v{font-weight:600;display:flex;align-items:center;gap:4px}
-.tip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* ── Arch row ── */
+.arch-row{
+  display:flex;justify-content:center;
+  gap:1px;
+  width:100%;max-width:820px;
+}
 
-/* Readout */
-#readout{position:absolute;bottom:14px;left:14px;padding:8px 12px;border-radius:8px;font-family:var(--mono);font-size:10px;color:var(--t4);display:flex;flex-direction:column;gap:3px;pointer-events:none;z-index:5}
-.rr{display:flex;gap:8px}
-.rk{min-width:32px;color:var(--t4)}.rv{color:var(--t2)}
+.midline{
+  width:100%;max-width:820px;
+  height:1px;background:var(--border);
+  margin:6px 0;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.midline span{
+  position:absolute;background:var(--bg);
+  padding:1px 10px;font-size:9.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);
+}
 
-/* ── PANEL ── */
-#panel{background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;position:relative}
-#panel::before{content:'';position:absolute;top:0;left:-1px;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(79,143,247,.25),transparent)}
-#ptabs{display:flex;padding:6px 6px 0;gap:2px;flex-shrink:0;border-bottom:1px solid var(--bd)}
-.ptab{flex:1;padding:7px 4px 8px;font-size:11.5px;font-weight:500;text-align:center;cursor:pointer;color:var(--t4);border-bottom:2px solid transparent;border-radius:var(--r2) var(--r2) 0 0;transition:.13s;user-select:none;margin-bottom:-1px}
-.ptab:hover{color:var(--t2);background:var(--sf2)}
-.ptab.on{color:var(--acs);border-bottom-color:var(--ac);background:var(--sf2)}
-#pbody{flex:1;overflow-y:auto;overflow-x:hidden}
-.pane{padding:14px}
+/* ── Tooth cell ── */
+.tooth-cell{
+  display:flex;flex-direction:column;align-items:center;
+  gap:3px;cursor:pointer;
+  padding:4px 3px;
+  border-radius:9px;
+  border:1.5px solid transparent;
+  transition:all .13s;
+  min-width:46px;
+}
+.tooth-cell:hover{background:var(--surface2);border-color:var(--border)}
+.tooth-cell.selected{
+  background:var(--accent-dim);
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-ring);
+}
+.tooth-cell.selected .fdi-num{color:var(--accent)}
 
-/* Overview */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
-.stat-card{padding:12px 13px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;top:-18px;right:-18px;width:44px;height:44px;border-radius:50%;filter:blur(20px);opacity:.35}
-.sc-ok::after{background:var(--ok)}.sc-dg::after{background:var(--dg)}.sc-ac::after{background:var(--ac)}.sc-t3::after{background:var(--t3)}
-.stat-n{font-size:26px;font-weight:200;font-family:var(--mono);line-height:1;position:relative}
-.stat-l{font-size:9.5px;font-weight:600;color:var(--t4);margin-top:5px;text-transform:uppercase;letter-spacing:.06em;position:relative}
-.sec-title{font-size:9.5px;font-weight:700;color:var(--t4);letter-spacing:.09em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin:0 0 10px}
-.sec-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-.stage-list{display:flex;flex-direction:column}
-.stage{display:flex;gap:11px;position:relative;padding-bottom:14px}
-.stage:last-child{padding-bottom:0}
-.stage-line{position:absolute;left:11px;top:24px;bottom:0;width:1.5px;background:var(--bd)}
-.stage:last-child .stage-line{display:none}
-.stage-dot{width:23px;height:23px;border-radius:50%;background:var(--sf3);border:1.5px solid var(--bd2);display:grid;place-items:center;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--t3);flex-shrink:0;z-index:1;transition:.13s}
-.stage.act .stage-dot{background:var(--ac2);border-color:var(--ac);color:var(--acs);box-shadow:0 0 0 3px rgba(79,143,247,.15)}
-.stage-body{flex:1;padding-top:1px}
-.stage-t{font-size:12px;font-weight:600;color:var(--t1)}
-.stage-d{font-size:10.5px;color:var(--t3);margin-top:2px;line-height:1.5}
-.stage-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
-.ftag{font-size:9.5px;font-weight:600;font-family:var(--mono);padding:2px 6px;background:var(--ac2);border-radius:4px;color:var(--acs);border:1px solid rgba(79,143,247,.18)}
+/* canvas wrapper */
+.tooth-canvas-wrap{
+  position:relative;width:42px;
+}
+.tooth-canvas-wrap canvas{display:block;width:42px}
 
-/* Tooth editor */
-.te-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bd);position:relative}
-.te-fdi{font-size:44px;font-weight:200;font-family:var(--mono);line-height:.85;letter-spacing:-.05em;background:linear-gradient(135deg,#fff,#6a80a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex-shrink:0}
-.te-info{flex:1;padding-top:4px}
-.te-nm{font-size:13px;font-weight:600;color:var(--t1);line-height:1.3}
-.te-sub{font-size:10.5px;color:var(--t3);margin-top:2px}
-.te-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;margin-top:7px;letter-spacing:.02em}
-.te-close{position:absolute;top:0;right:0;width:24px;height:24px;border-radius:6px;border:1px solid var(--bd);background:var(--sf2);color:var(--t4);cursor:pointer;display:grid;place-items:center;transition:.12s}
-.te-close:hover{color:var(--t1);background:var(--sf3);border-color:var(--bd2)}
-.te-close svg{width:12px;height:12px}
+.fdi-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;font-weight:500;
+  color:var(--text-muted);line-height:1;
+}
 
-/* Surface diagram */
-.surf-wrap{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:2px}
-.szn{cursor:pointer;transition:.12s}.szn:hover{filter:brightness(1.3)}
-.surf-leg{display:flex;justify-content:center;gap:14px;margin-top:8px}
-.sl-it{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)}
-.sl-sq{width:9px;height:9px;border-radius:3px}
+.cond-pip{
+  width:5px;height:5px;border-radius:50%;
+  opacity:0;transition:opacity .13s;
+}
+.cond-pip.show{opacity:1}
 
-.fl{font-size:9px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin:14px 0 6px;display:flex;align-items:center;gap:5px}
-.fl:first-child{margin-top:0}
-.fl-sq{width:6px;height:6px;border-radius:2px;flex-shrink:0}
-.fd{width:100%;font-size:12.5px;font-family:var(--sans);padding:8px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf2);color:var(--t1);transition:.13s;appearance:none}
-select.fd{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235f6e8a' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:30px;cursor:pointer}
-.fd:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
-.fd:hover{border-color:var(--bd3)}
-textarea.fd{resize:none;height:58px;line-height:1.55;font-size:12px}
+/* ── Legend ── */
+.legend{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  gap:2px;padding:6px 0 2px;width:100%;max-width:820px;
+}
+.legend-item{
+  display:flex;align-items:center;gap:4px;
+  font-size:10px;color:var(--text-muted);padding:2px 6px;
+}
+.legend-swatch{width:7px;height:7px;border-radius:50%}
 
-/* Segmented */
-.seg{display:flex;background:var(--sf2);border:1px solid var(--bd2);border-radius:8px;padding:3px;gap:2px}
-.seg-o{flex:1;padding:6px 4px;font-size:11px;font-weight:500;text-align:center;color:var(--t3);cursor:pointer;border-radius:5px;transition:.12s;user-select:none}
-.seg-o:hover{color:var(--t2)}.seg-o.on{background:var(--ac2);color:var(--acs)}
+/* ── Side panel ── */
+.side{
+  width:272px;flex-shrink:0;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.side-header{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+}
+.side-header h3{
+  font-size:11px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--text-muted);
+}
 
-.btn-save{width:100%;margin-top:16px;padding:10px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--ac),var(--acg));color:#fff;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer;transition:.15s;box-shadow:0 2px 14px rgba(79,143,247,.28);display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-save:hover{filter:brightness(1.08);transform:translateY(-1px)}
-.btn-save svg{width:13px;height:13px}
-.btn-save.ok{background:linear-gradient(135deg,var(--ok),#0ea882)}
+.side-empty{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:10px;padding:28px 20px;
+  color:var(--text-muted);text-align:center;
+}
+.side-empty svg{opacity:.25}
+.side-empty p{font-size:12px;line-height:1.55}
 
-.empty{text-align:center;padding:48px 20px}
-.empty-icon{width:48px;height:48px;margin:0 auto 14px;border-radius:12px;background:var(--sf2);border:1px solid var(--bd);display:grid;place-items:center}
-.empty-icon svg{width:22px;height:22px;color:var(--t4)}
-.empty-t{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px}
-.empty-s{font-size:11.5px;color:var(--t4);line-height:1.7}
+.side-detail{display:none;flex-direction:column;flex:1;overflow-y:auto}
+.side-detail.active{display:flex}
 
-/* Legend */
-.leg-group{margin-bottom:16px}
-.leg-item{display:flex;align-items:center;gap:9px;padding:5px 0}
-.leg-sw{width:16px;height:16px;border-radius:5px;flex-shrink:0;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
-.leg-text{font-size:12px;color:var(--t2)}
-.leg-text small{display:block;font-size:10px;color:var(--t4);margin-top:1px}
-.kbd-list{display:flex;flex-direction:column;gap:7px}
-.kbd-item{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--t3)}
-.kbd{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;background:var(--sf3);border:1px solid var(--bd2);border-radius:5px;color:var(--t2)}
+.tooth-hero{
+  padding:16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;
+}
+.hero-canvas-wrap{
+  width:52px;height:76px;flex-shrink:0;position:relative;
+}
+.hero-canvas-wrap canvas{display:block;width:52px}
+.hero-info{flex:1}
+.hero-fdi{
+  font-family:'JetBrains Mono',monospace;
+  font-size:26px;font-weight:500;
+  color:var(--text-primary);line-height:1;margin-bottom:3px;
+}
+.hero-name{font-size:12px;color:var(--text-secondary);margin-bottom:8px}
+.cond-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:20px;
+  font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+}
 
-/* Status bar */
-#sbar{display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--sf);border-top:1px solid var(--bd);font-size:10px;color:var(--t4);font-family:var(--mono)}
-.sdot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 5px var(--ok);flex-shrink:0}
-@keyframes sblink{0%,100%{opacity:1}50%{opacity:.25}}.sdot{animation:sblink 2.5s ease-in-out infinite}
-.ssep{width:1px;height:10px;background:var(--bd)}
-#sbar-r{margin-left:auto;display:flex;gap:10px;align-items:center}
-.sfps{color:var(--ok)}
+.section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.section h4{
+  font-size:10.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:9px;
+}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
-::-webkit-scrollbar-thumb:hover{background:var(--bd3)}
+.cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.cond-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 9px;border-radius:6px;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text-secondary);cursor:pointer;
+  font-size:11.5px;font-weight:500;font-family:inherit;
+  transition:all .11s;text-align:left;
+}
+.cond-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.cond-btn .pip{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-/* Divider */
-.divl{height:1px;background:var(--bd);margin:12px 0}
+.tx-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.tx-chip{
+  padding:3px 9px;border-radius:20px;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text-secondary);font-size:11px;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:all .11s;
+}
+.tx-chip:hover{border-color:var(--border2);color:var(--text-primary)}
+.tx-chip.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 
-/* ═══ NEW: Mode containers ═══ */
-#mode-stages,#mode-ba,#mode-patient{display:none;flex:1;overflow-y:auto;overflow-x:hidden}
-.mode-hd{padding:14px 14px 0}
-.mode-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px}
-.mode-sub{font-size:11px;color:var(--t3);line-height:1.6;margin-bottom:14px}
+.mob-row{display:flex;gap:5px}
+.mob-btn{
+  flex:1;padding:5px;border-radius:6px;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text-secondary);font-size:12px;font-weight:600;
+  font-family:'JetBrains Mono',monospace;cursor:pointer;
+  transition:all .11s;text-align:center;
+}
+.mob-btn:hover{border-color:var(--border2)}
+.mob-btn.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 
-/* ═══ Phase cards (Visit Stages) ═══ */
-.phase-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;margin:0 14px 10px;overflow:hidden}
-.phase-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd)}
-.phase-num{width:22px;height:22px;border-radius:50%;background:var(--sf3);border:1.5px solid var(--bd2);display:grid;place-items:center;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--t3);flex-shrink:0}
-.phase-title-inp{flex:1;background:transparent;border:none;color:var(--t1);font-size:12.5px;font-weight:600;font-family:var(--sans);padding:2px 4px;border-radius:4px}
-.phase-title-inp:focus{outline:none;background:var(--sf3)}
-.phase-del{width:20px;height:20px;border-radius:5px;border:none;background:transparent;color:var(--t4);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
-.phase-del:hover{color:var(--dg);background:rgba(244,63,94,.1)}
-.phase-del svg{width:11px;height:11px}
-.phase-body{padding:10px 12px}
-.phase-row{display:flex;gap:8px;margin-bottom:8px}
-.phase-status{flex:1;font-size:11px;padding:6px 8px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--t2);font-family:var(--sans)}
-.phase-date{width:118px;font-size:11px;padding:6px 8px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--t2);font-family:var(--sans)}
-.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:100px;letter-spacing:.03em;text-transform:uppercase}
-.status-notstarted{background:var(--sf3);color:var(--t3)}
-.status-inprogress{background:var(--ac2);color:var(--acs)}
-.status-completed{background:rgba(16,217,160,.12);color:var(--ok)}
-.phase-notes{width:100%;font-size:11.5px;padding:7px 9px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--t2);font-family:var(--sans);resize:none;height:44px;margin-bottom:8px;line-height:1.5}
-.phase-teeth-lbl{font-size:9px;font-weight:700;color:var(--t4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
-.phase-teeth{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;min-height:20px}
-.pchip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;font-family:var(--mono);padding:3px 4px 3px 8px;background:var(--ac2);color:var(--acs);border-radius:6px;border:1px solid rgba(79,143,247,.2);cursor:pointer;transition:.12s}
-.pchip:hover{background:rgba(79,143,247,.22)}
-.pchip button{width:14px;height:14px;border:none;background:rgba(255,255,255,.08);border-radius:50%;color:var(--t2);cursor:pointer;display:grid;place-items:center;font-size:9px;line-height:1}
-.pchip button:hover{background:var(--dg);color:#fff}
-.phase-add-tooth{display:flex;gap:6px}
-.phase-add-tooth select{flex:1;font-size:11px;padding:6px 8px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--t2);font-family:var(--sans)}
-.phase-add-tooth button{padding:6px 10px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--acs);font-size:11px;font-weight:700;cursor:pointer}
-.phase-add-tooth button:hover{background:var(--ac2)}
-.btn-add-phase{margin:4px 14px 16px;padding:9px;border-radius:9px;border:1.5px dashed var(--bd3);background:transparent;color:var(--t3);font-size:11.5px;font-weight:600;font-family:var(--sans);cursor:pointer;width:calc(100% - 28px);display:flex;align-items:center;justify-content:center;gap:6px;transition:.13s}
-.btn-add-phase:hover{border-color:var(--ac);color:var(--acs);background:var(--ac2)}
+.note-box{
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:6px;
+  color:var(--text-primary);font-family:inherit;font-size:12.5px;
+  padding:8px 10px;resize:vertical;min-height:68px;
+  outline:none;transition:border-color .13s;
+}
+.note-box:focus{border-color:var(--accent)}
+.note-box::placeholder{color:var(--text-muted)}
 
-/* ═══ Before/After compare mode ═══ */
-.cmp-stat-row{display:flex;gap:8px;padding:0 14px;margin-bottom:14px}
-.cmp-stat{flex:1;padding:11px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);text-align:center}
-.cmp-stat-n{font-size:22px;font-weight:250;font-family:var(--mono);color:var(--t1)}
-.cmp-stat-l{font-size:9px;color:var(--t4);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
-.cmp-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:.12s}
-.cmp-row:hover{background:var(--sf2)}
-.cmp-fdi{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--t1);width:26px;flex-shrink:0}
-.cmp-arrow{display:flex;align-items:center;gap:6px;flex:1;font-size:11px}
-.cmp-from{color:var(--t3)}
-.cmp-to{color:var(--acs);font-weight:600}
-.cmp-sep{color:var(--t4)}
-.btn-capture{margin:14px;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--ac),var(--acg));color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;width:calc(100% - 28px);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 2px 14px rgba(79,143,247,.3)}
-.btn-capture svg{width:14px;height:14px}
-.cmp-empty{text-align:center;padding:40px 20px;color:var(--t4);font-size:11.5px;line-height:1.7}
+.side-actions{
+  padding:11px 16px;border-top:1px solid var(--border);margin-top:auto;
+}
+.btn-full{width:100%;justify-content:center}
 
-/* ═══ Patient friendly view ═══ */
-.pv-card{margin:0 14px 14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--ac2),var(--sf2));border:1px solid rgba(79,143,247,.2)}
-.pv-fdi{font-size:34px;font-weight:200;font-family:var(--mono);color:var(--t1);line-height:1}
-.pv-name{font-size:13px;font-weight:600;color:var(--t1);margin-top:2px}
-.pv-text{font-size:12px;color:var(--t2);line-height:1.7;margin-top:10px}
-.pv-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px;margin-bottom:16px}
-.pv-sum{padding:14px;border-radius:12px;background:var(--sf2);border:1px solid var(--bd);text-align:center}
-.pv-sum-n{font-size:24px;font-weight:250;font-family:var(--mono)}
-.pv-sum-l{font-size:10px;color:var(--t4);margin-top:4px;font-weight:500}
-.pv-legend-item{display:flex;align-items:center;gap:10px;padding:8px 14px}
-.pv-legend-sw{width:18px;height:18px;border-radius:6px;flex-shrink:0}
-.pv-legend-t{font-size:12.5px;color:var(--t2);font-weight:500}
+/* ── Stats ── */
+.statsbar{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:9px 18px;display:flex;align-items:center;
+  gap:16px;flex-wrap:wrap;
+}
+.stat{display:flex;align-items:center;gap:5px;font-size:11.5px}
+.stat-dot{width:7px;height:7px;border-radius:50%}
+.stat-n{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:12px}
+.stat-l{color:var(--text-muted)}
 
-/* ═══ Advisories (intelligence layer) ═══ */
-.adv-card{display:flex;gap:9px;padding:10px 11px;border-radius:10px;margin-bottom:7px;cursor:pointer;transition:.12s;border:1px solid transparent}
-.adv-card:hover{filter:brightness(1.15)}
-.adv-warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)}
-.adv-info{background:var(--ac2);border-color:rgba(79,143,247,.18)}
-.adv-ic{width:16px;height:16px;flex-shrink:0;margin-top:1px}
-.adv-warn .adv-ic{color:var(--wn)}
-.adv-info .adv-ic{color:var(--acs)}
-.adv-txt{font-size:11px;color:var(--t2);line-height:1.5}
-.adv-txt b{color:var(--t1);font-family:var(--mono)}
-.adv-empty{font-size:11px;color:var(--t4);padding:6px 2px}
-
-/* ═══ Filtered teeth (stat card drill-down) ═══ */
-.filt-hd{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px}
-.filt-clear{font-size:10px;color:var(--t4);cursor:pointer;font-weight:600}
-.filt-clear:hover{color:var(--dg)}
-.filt-chips{display:flex;flex-wrap:wrap;gap:5px}
-.fchip{font-size:11px;font-weight:600;font-family:var(--mono);padding:5px 10px;background:var(--sf2);color:var(--t2);border-radius:7px;border:1px solid var(--bd2);cursor:pointer;transition:.12s}
-.fchip:hover{background:var(--ac2);color:var(--acs);border-color:rgba(79,143,247,.3)}
-
-/* ═══ Related teeth (tooth editor) ═══ */
-.rel-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.rel-lbl{font-size:10px;color:var(--t4);font-weight:600;min-width:58px}
-.rel-chips{display:flex;flex-wrap:wrap;gap:4px}
-.rchip{font-size:10px;font-weight:700;font-family:var(--mono);padding:3px 8px;border-radius:6px;cursor:pointer;transition:.12s;border:1px solid var(--bd2);background:var(--sf3);color:var(--t2)}
-.rchip:hover{background:var(--ac2);color:var(--acs)}
-.rchip.on{background:var(--ac2);color:var(--acs);border-color:rgba(79,143,247,.35)}
-.rchip.none{color:var(--t4);cursor:default;font-weight:400;border-style:dashed}
-
-/* ═══ Activity tab ═══ */
-.act-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:.12s}
-.act-item:hover{background:var(--sf2)}
-.act-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0;margin-top:5px}
-.act-body{flex:1}
-.act-txt{font-size:11.5px;color:var(--t2);line-height:1.5}
-.act-txt b{color:var(--t1)}
-.act-time{font-size:9.5px;color:var(--t4);margin-top:2px;font-family:var(--mono)}
-.act-empty{text-align:center;padding:48px 20px;color:var(--t4);font-size:11.5px;line-height:1.7}
-
-/* ═══ Patient info popover ═══ */
-#pat-pop{position:absolute;top:52px;left:200px;width:230px;border-radius:12px;padding:14px;z-index:50;display:none}
-.pat-fld{margin-bottom:9px}
-.pat-fld label{font-size:9px;font-weight:700;color:var(--t4);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px}
-.pat-fld input{width:100%;font-size:12px;padding:7px 9px;border-radius:7px;border:1px solid var(--bd2);background:var(--sf3);color:var(--t1);font-family:var(--sans)}
-.pat-fld input:focus{outline:none;border-color:var(--ac)}
-.pat-pop-close{width:100%;margin-top:4px;padding:7px;border-radius:7px;border:none;background:var(--ac);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
-
+@media(max-width:680px){
+  .shell{flex-direction:column}
+  .side{width:100%;border-left:none;border-top:1px solid var(--border);max-height:320px}
+  .tooth-cell{min-width:32px}
+}
 </style>
-</head>
-<body>
-<div id="app">
 
-<!-- HEADER -->
-<div id="hdr">
-  <div class="logo">
-    <div class="logo-gem">
-      <svg viewBox="0 0 28 28" fill="none"><path d="M14 2.5L23.5 7.5V20.5L14 25.5L4.5 20.5V7.5L14 2.5Z" fill="#0d1a30" stroke="#4f8ff7" stroke-width="1.3"/><path d="M14 8L19.2 11V17L14 20L8.8 17V11L14 8Z" fill="#4f8ff7" opacity=".75"/><circle cx="14" cy="14" r="2.5" fill="#7db3ff"/></svg>
+<div style="display:flex;flex-direction:column;min-height:100%">
+
+<!-- top bar -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="logo">
+      <svg viewBox="0 0 20 20"><path d="M10 2C7 2 4.5 4.2 4.5 7c0 1.7.8 3.2 2 4.2L5.2 18H9l1-5 1 5h3.8l-1.3-6.8c1.2-1 2-2.5 2-4.2C15.5 4.2 13 2 10 2z"/></svg>
     </div>
-    <div><div class="logo-text">Denta<span>Viz</span></div><div class="logo-sub">Clinical 3D</div></div>
+    <span class="app-name">DentiChart</span>
   </div>
-  <div class="nav">
-    <div class="ntab on" onclick="setNav(this,'plan')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Treatment Plan</div>
-    <div class="ntab" onclick="setNav(this,'stages')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Visit Stages</div>
-    <div class="ntab" onclick="setNav(this,'ba')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v18"/><circle cx="12" cy="12" r="9"/></svg>Before / After</div>
-    <div class="ntab" onclick="setNav(this,'patient')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Patient View</div>
+  <div class="patient-pill">
+    <span class="pname">John A. Mensah</span>
+    <span class="pdob">DOB: 1987-04-12</span>
   </div>
-  <div class="hsp"></div>
-  <div class="pat-chip" onclick="togglePatPop(event)" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 6px;background:var(--sf2);border:1px solid var(--bd2);border-radius:100px;cursor:pointer;margin-right:6px">
-    <div class="pat-av" id="pat-av" style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--pu));display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff">DP</div>
-    <div><div class="pat-name" id="pat-name-disp" style="font-size:11px;font-weight:600;color:var(--t1)">Demo Patient</div><div class="pat-meta" id="pat-meta-disp" style="font-size:9px;color:var(--t4)">Chart —</div></div>
-  </div>
-  <div class="glass" id="pat-pop">
-    <div class="pat-fld"><label>Patient Name</label><input type="text" id="pat-in-name" value="Demo Patient" oninput="updatePatient()"></div>
-    <div class="pat-fld"><label>Chart Number</label><input type="text" id="pat-in-chart" value="" placeholder="e.g. LDS-0421" oninput="updatePatient()"></div>
-    <div class="pat-fld"><label>Date of Birth</label><input type="text" id="pat-in-dob" value="" placeholder="e.g. 12 Mar 1990" oninput="updatePatient()"></div>
-    <button class="pat-pop-close" onclick="togglePatPop(event)">Done</button>
-  </div>
-  <button class="hbtn blue" onclick="openLoader()">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Load Model
-  </button>
-  <button class="hbtn" onclick="resetAll()" title="Reset all changes">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-  </button>
-  <div class="changepill" id="changepill">0 changes</div>
-</div>
-
-<!-- BODY -->
-<div id="body">
-
-<!-- 3D VIEWPORT -->
-<div id="vp">
-  <canvas id="cv"></canvas>
-  <div class="vp-fade-t"></div>
-  <div class="vp-fade-b"></div>
-
-  <!-- Loading overlay -->
-  <div id="ld-overlay">
-    <div class="ld-box">
-      <div class="ld-spinner">
-        <svg viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="22" stroke="#1a2540" stroke-width="2.5"/><path d="M26 4a22 22 0 0122 22" stroke="#4f8ff7" stroke-width="2.5" stroke-linecap="round"/></svg>
-      </div>
-      <div class="ld-h">Load your dental model</div>
-      <div class="ld-p">Drop a GLB file with teeth named by FDI notation (11–48). Rendered with the industry-standard glTF loader — same engine as professional dental viewers.</div>
-      <div class="ld-dropzone" id="ld-dz" onclick="document.getElementById('ld-file').click()">
-        <div class="ld-dz-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-        <div class="ld-dz-t">Drop teeth_library.glb here</div>
-        <div class="ld-dz-s">or click to browse · GLB format</div>
-      </div>
-      <input type="file" id="ld-file" accept=".glb,.gltf" onchange="handleFile(this.files[0])">
-      <div class="ld-divider">or</div>
-      <button class="ld-demo-btn" onclick="skipToDemo()">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Continue without model (placeholder geometry)
-      </button>
-      <div class="ld-progress" id="ld-prog">
-        <div class="ld-track"><div class="ld-bar" id="ld-bar"></div></div>
-        <div class="ld-msg" id="ld-msg">Reading file…</div>
-      </div>
-      <div class="ld-hint"><b>From Blender:</b> Name each tooth object 11–48 (FDI), select all, File → Export → glTF Binary (.glb).</div>
-    </div>
-  </div>
-
-  <!-- Selected tooth HUD -->
-  <div class="glass" id="hud">
-    <div class="hud-top">
-      <div class="hud-lbl">Selected Tooth</div>
-      <div class="hud-main">
-        <div class="hud-fdi" id="hud-fdi">—</div>
-        <div><div class="hud-name" id="hud-name">—</div><div class="hud-arch" id="hud-arch">—</div></div>
-      </div>
-    </div>
-    <div class="hud-body">
-      <div class="hud-row"><span class="hud-k">Condition</span><span class="hud-v" id="hud-cond"><span class="hud-dot"></span>—</span></div>
-      <div class="hud-row"><span class="hud-k">Treatment</span><span class="hud-v" id="hud-tx" style="color:var(--acs)">—</span></div>
-    </div>
-  </div>
-
-  <!-- Model badge -->
-  <div class="glass" id="badge"><span class="bd"></span><span id="badge-txt"></span></div>
-
-  <!-- View tools -->
-  <div class="glass" id="vtools">
-    <div class="vt" onclick="tgl('gum',this)"><span class="vt-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12c0-3 2-5 5-5s4 2 4 5 2 5 4 5 5-2 5-5"/></svg></span>Gum<span class="vtoggle"></span></div>
-    <div class="vt" onclick="tgl('xray',this)"><span class="vt-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></span>X-ray<span class="vtoggle"></span></div>
-    <div class="vt" onclick="tgl('roots',this)"><span class="vt-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8 2 6 5 6 9c0 3 1 5 1 8s1 5 2 5 2-3 2-5 .5-3 1-3 1 1 1 3 .5 5 2 5 2-2 2-5 1-5 1-8c0-4-2-7-6-7z"/></svg></span>Show Roots<span class="vtoggle"></span></div>
-    <div class="vt" onclick="tgl('explode',this)"><span class="vt-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg></span>Explode<span class="vtoggle"></span></div>
-    <div class="vt" onclick="tgl('wire',this)"><span class="vt-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>Wireframe<span class="vtoggle"></span></div>
-  </div>
-
-  <!-- BA slider -->
-  <div class="glass" id="ba-wrap">
-    <span class="ba-label cur" id="ba-cur">Current</span>
-    <input type="range" id="ba-range" min="0" max="100" value="0" oninput="onBA(+this.value)">
-    <span class="ba-label aft" id="ba-aft">Proposed</span>
-    <span class="ba-pct" id="ba-pct">0%</span>
-  </div>
-
-  <!-- Camera dock -->
-  <div class="glass" id="camdock">
-    <div class="cb" onclick="camGo('front',this)">FRONT</div>
-    <div class="cb" onclick="camGo('top',this)">TOP</div>
-    <div class="cb" onclick="camGo('btm',this)">BTM</div>
-    <div class="cb-div"></div>
-    <div class="cb" onclick="camGo('left',this)">LEFT</div>
-    <div class="cb" onclick="camGo('right',this)">RIGHT</div>
-    <div class="cb-div"></div>
-    <div class="cb on" onclick="camGo('iso',this)">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>3D
-    </div>
-  </div>
-
-  <!-- Tooltip -->
-  <div class="glass" id="tip">
-    <div class="tip-top"><div class="tip-fdi" id="tip-fdi"></div><div class="tip-nm" id="tip-nm"></div></div>
-    <div class="tip-body">
-      <div class="tip-row"><span class="tip-k">Condition</span><span class="tip-v" id="tip-cond"></span></div>
-      <div class="tip-row" id="tip-tx-row"><span class="tip-k">Treatment</span><span class="tip-v" id="tip-tx" style="color:var(--acs)"></span></div>
-    </div>
-  </div>
-
-  <!-- Readout -->
-  <div class="glass" id="readout">
-    <div class="rr"><span class="rk">MDL</span><span class="rv" id="ro-model">—</span></div>
-    <div class="rr"><span class="rk">TEE</span><span class="rv" id="ro-teeth">—</span></div>
-    <div class="rr"><span class="rk">TRI</span><span class="rv" id="ro-tris">—</span></div>
-  </div>
-
-</div><!-- end #vp -->
-
-<!-- SIDE PANEL -->
-<div id="panel">
-
-<div id="mode-plan" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-  <div id="ptabs">
-    <div class="ptab on" onclick="setPTab(this,'ov')">Overview</div>
-    <div class="ptab" onclick="setPTab(this,'tooth')">Tooth</div>
-    <div class="ptab" onclick="setPTab(this,'legend')">Legend</div>
-    <div class="ptab" onclick="setPTab(this,'activity')">Activity</div>
-  </div>
-  <div id="pbody">
-
-    <!-- OVERVIEW pane -->
-    <div class="pane" id="pane-ov">
-      <div class="stat-grid">
-        <div class="stat-card sc-ok" onclick="filterTeeth(\'sound\')" style="cursor:pointer"><div class="stat-n" id="st-sound" style="color:var(--t1)">32</div><div class="stat-l">Sound</div></div>
-        <div class="stat-card sc-dg" onclick="filterTeeth(\'caries\')" style="cursor:pointer"><div class="stat-n" id="st-caries" style="color:var(--dg)">0</div><div class="stat-l">Caries</div></div>
-        <div class="stat-card sc-ac" onclick="filterTeeth(\'planned\')" style="cursor:pointer"><div class="stat-n" id="st-plan" style="color:var(--acs)">0</div><div class="stat-l">Planned Tx</div></div>
-        <div class="stat-card sc-t3" onclick="filterTeeth(\'missing\')" style="cursor:pointer"><div class="stat-n" id="st-miss" style="color:var(--t3)">0</div><div class="stat-l">Missing</div></div>
-      </div>
-      <div class="sec-title">Treatment Sequence</div>
-      <div class="stage-list" id="stage-list"></div>
-
-      <div class="sec-title">Clinical Advisories</div>
-      <div id="advisory-list"></div>
-
-      <div id="filt-section" style="display:none">
-        <div class="filt-hd"><span class="sec-title" style="margin:0" id="filt-title">Filtered</span><span class="filt-clear" onclick="clearFilter()">✕ Clear</span></div>
-        <div class="filt-chips" id="filt-chips"></div>
-      </div>
-    </div>
-
-    <!-- TOOTH pane -->
-    <div class="pane" id="pane-tooth" style="display:none">
-      <div class="empty" id="te-empty">
-        <div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2C8 2 6 5 6 9c0 3 1 5 1 8s1 5 2 5 2-3 2-5 .5-3 1-3 1 1 1 3 .5 5 2 5 2-2 2-5 1-5 1-8c0-4-2-7-6-7z"/></svg></div>
-        <div class="empty-t">No tooth selected</div>
-        <div class="empty-s">Click any tooth in the<br>3D view to inspect and edit</div>
-      </div>
-      <div id="te-editor" style="display:none">
-        <div class="te-top">
-          <div class="te-fdi" id="te-fdi">—</div>
-          <div class="te-info">
-            <div class="te-nm" id="te-nm">—</div>
-            <div class="te-sub" id="te-sub">—</div>
-            <div class="te-badge" id="te-badge" style="display:none"></div>
-          </div>
-          <button class="te-close" onclick="clearSel()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--dg)"></span>Affected Surfaces</div>
-        <div class="surf-wrap">
-          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-            <rect x="50" y="8" width="100" height="90" rx="13" fill="#0d1220" stroke="#1a2540" stroke-width="1.5"/>
-            <!-- Buccal top -->
-            <path id="szb" class="szn" d="M50 21 Q50 8 63 8 L137 8 Q150 8 150 21 L150 32 L50 32Z" fill="#161e2e" stroke="#243358" stroke-width="1" onclick="tSurf('b')"/>
-            <!-- Lingual bottom -->
-            <path id="szl" class="szn" d="M50 74 L150 74 L150 85 Q150 98 137 98 L63 98 Q50 98 50 85Z" fill="#161e2e" stroke="#243358" stroke-width="1" onclick="tSurf('l')"/>
-            <!-- Mesial left -->
-            <rect id="szm" class="szn" x="50" y="32" width="17" height="42" fill="#161e2e" stroke="#243358" stroke-width="1" onclick="tSurf('m')"/>
-            <!-- Distal right -->
-            <rect id="szd" class="szn" x="133" y="32" width="17" height="42" fill="#161e2e" stroke="#243358" stroke-width="1" onclick="tSurf('d')"/>
-            <!-- Occlusal centre -->
-            <rect id="szo" class="szn" x="67" y="32" width="66" height="42" rx="7" fill="#161e2e" stroke="#243358" stroke-width="1" onclick="tSurf('o')"/>
-            <!-- Labels -->
-            <text x="100" y="22" text-anchor="middle" font-size="9" fill="#3d4e68" font-family="Inter,sans-serif" font-weight="600" pointer-events="none">B</text>
-            <text x="100" y="91" text-anchor="middle" font-size="9" fill="#3d4e68" font-family="Inter,sans-serif" font-weight="600" pointer-events="none">L</text>
-            <text x="59" y="56" text-anchor="middle" font-size="9" fill="#3d4e68" font-family="Inter,sans-serif" font-weight="600" pointer-events="none">M</text>
-            <text x="141" y="56" text-anchor="middle" font-size="9" fill="#3d4e68" font-family="Inter,sans-serif" font-weight="600" pointer-events="none">D</text>
-            <text x="100" y="56" text-anchor="middle" font-size="9" fill="#3d4e68" font-family="Inter,sans-serif" font-weight="700" pointer-events="none">O</text>
-          </svg>
-          <div class="surf-leg">
-            <div class="sl-it"><span class="sl-sq" style="background:var(--dg)"></span>Affected</div>
-            <div class="sl-it"><span class="sl-sq" style="background:var(--ac)"></span>Planned</div>
-          </div>
-        </div>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--t3)"></span>Condition</div>
-        <select class="fd" id="te-cond" onchange="liveUp()">
-          <option value="sound">Sound</option>
-          <option value="caries">Caries / decay</option>
-          <option value="restored">Existing restoration</option>
-          <option value="crown">Existing crown</option>
-          <option value="missing">Missing / extracted</option>
-          <option value="implant">Implant (existing)</option>
-          <option value="unerupted">Unerupted</option>
-        </select>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--ac)"></span>Proposed Treatment</div>
-        <select class="fd" id="te-tx" onchange="liveUp()">
-          <option value="none">No treatment</option>
-          <option value="composite">Composite restoration</option>
-          <option value="crown_p">Porcelain crown</option>
-          <option value="pfm">PFM crown</option>
-          <option value="extraction">Extraction</option>
-          <option value="implant_p">Implant + crown</option>
-          <option value="veneer">Porcelain veneer</option>
-          <option value="endo">Root canal (RCT)</option>
-          <option value="bridge">Bridge abutment</option>
-          <option value="watch">Monitor / watch</option>
-        </select>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--t3)"></span>Mobility</div>
-        <div class="seg" id="te-mob">
-          <div class="seg-o on" onclick="pickSeg(this,'mob','0')">0</div>
-          <div class="seg-o" onclick="pickSeg(this,'mob','1')">I</div>
-          <div class="seg-o" onclick="pickSeg(this,'mob','2')">II</div>
-          <div class="seg-o" onclick="pickSeg(this,'mob','3')">III</div>
-        </div>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--t3)"></span>Clinical Note</div>
-        <textarea class="fd" id="te-note" placeholder="Findings, patient concerns, special considerations…"></textarea>
-
-        <div class="fl"><span class="fl-sq" style="background:var(--pu)"></span>Related Teeth</div>
-        <div id="related-block">
-          <div class="rel-row"><span class="rel-lbl">Adjacent</span><div class="rel-chips" id="rel-adjacent"></div></div>
-          <div class="rel-row"><span class="rel-lbl">Opposing</span><div class="rel-chips" id="rel-opposing"></div></div>
-          <div class="rel-row" id="rel-bridge-row" style="display:none"><span class="rel-lbl">Bridge grp</span><div class="rel-chips" id="rel-bridge"></div></div>
-        </div>
-
-        <button class="btn-save" id="btn-save" onclick="saveTooth()">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save Changes
-        </button>
-      </div>
-    </div>
-
-    <!-- LEGEND pane -->
-    <div class="pane" id="pane-legend" style="display:none">
-      <div class="sec-title">Conditions</div>
-      <div class="leg-group">
-        <div class="leg-item"><div class="leg-sw" style="background:#e8e2d5"></div><div class="leg-text">Sound<small>Healthy natural enamel</small></div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#6b2b0d"></div><div class="leg-text">Caries<small>Active decay</small></div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#b8913a"></div><div class="leg-text">Restoration<small>Existing filling</small></div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#5a6878"></div><div class="leg-text">Crown<small>Existing prosthetic</small></div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#181e2c;border:1px dashed #3d4e68"></div><div class="leg-text">Missing<small>Edentulous space</small></div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#2d5a78"></div><div class="leg-text">Implant<small>Placed fixture</small></div></div>
-      </div>
-      <div class="sec-title">Proposed Treatments</div>
-      <div class="leg-group">
-        <div class="leg-item"><div class="leg-sw" style="background:#1d4ed8"></div><div class="leg-text">Crown / PFM</div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#b91c3a"></div><div class="leg-text">Extraction</div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#059669"></div><div class="leg-text">Implant placement</div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#b45309"></div><div class="leg-text">Endodontic / RCT</div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#6d28d9"></div><div class="leg-text">Veneer</div></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#0e7490"></div><div class="leg-text">Composite</div></div>
-      </div>
-      <div class="sec-title">Controls</div>
-      <div class="kbd-list">
-        <div class="kbd-item"><span>Orbit</span><span class="kbd">Drag</span></div>
-        <div class="kbd-item"><span>Zoom</span><span class="kbd">Scroll</span></div>
-        <div class="kbd-item"><span>Select tooth</span><span class="kbd">Click</span></div>
-        <div class="kbd-item"><span>Zoom to tooth</span><span class="kbd">Dbl-click</span></div>
-        <div class="kbd-item"><span>Camera views</span><span class="kbd">F T L R</span></div>
-        <div class="kbd-item"><span>Deselect</span><span class="kbd">Esc</span></div>
-      </div>
-    </div>
-
-    <!-- ACTIVITY pane -->
-    <div class="pane" id="pane-activity" style="display:none;padding:0">
-      <div id="activity-list"></div>
-    </div>
-
-  </div><!-- #pbody -->
-</div><!-- #mode-plan -->
-
-<!-- ═══ VISIT STAGES mode ═══ -->
-<div id="mode-stages">
-  <div class="mode-hd">
-    <div class="mode-title">Treatment Phases</div>
-    <div class="mode-sub">Plan and track the sequence of care. Each phase can hold multiple teeth — click a chip to highlight it in the 3D view.</div>
-  </div>
-  <div id="phase-list"></div>
-  <button class="btn-add-phase" onclick="addPhase()">
-    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Add Phase
-  </button>
-</div>
-
-<!-- ═══ BEFORE / AFTER mode ═══ -->
-<div id="mode-ba">
-  <div class="mode-hd">
-    <div class="mode-title">Before / After Comparison</div>
-    <div class="mode-sub">Every tooth with a proposed treatment, current condition versus the planned outcome. Use the slider at the bottom of the 3D view to preview.</div>
-  </div>
-  <div class="cmp-stat-row">
-    <div class="cmp-stat"><div class="cmp-stat-n" id="cmp-total">0</div><div class="cmp-stat-l">Teeth changing</div></div>
-    <div class="cmp-stat"><div class="cmp-stat-n" id="cmp-pct">0%</div><div class="cmp-stat-l">Preview blend</div></div>
-  </div>
-  <div id="cmp-list"></div>
-  <button class="btn-capture" onclick="captureSnapshot()">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    Capture Comparison Image
-  </button>
-</div>
-
-<!-- ═══ PATIENT VIEW mode ═══ -->
-<div id="mode-patient">
-  <div class="mode-hd">
-    <div class="mode-title">Your Treatment Plan</div>
-    <div class="mode-sub" id="pv-intro">Click on any tooth in the 3D model to learn more about it, in plain language.</div>
-  </div>
-  <div id="pv-content">
-    <div class="pv-summary-grid">
-      <div class="pv-sum"><div class="pv-sum-n" id="pv-healthy" style="color:var(--ok)">32</div><div class="pv-sum-l">Healthy teeth</div></div>
-      <div class="pv-sum"><div class="pv-sum-n" id="pv-attention" style="color:var(--wn)">0</div><div class="pv-sum-l">Need attention</div></div>
-    </div>
-    <div class="sec-title" style="margin:0 14px 8px">What the colours mean</div>
-    <div class="pv-legend-item"><div class="pv-legend-sw" style="background:#e8e2d5"></div><div class="pv-legend-t">Healthy tooth</div></div>
-    <div class="pv-legend-item"><div class="pv-legend-sw" style="background:#6b2b0d"></div><div class="pv-legend-t">Needs treatment (decay)</div></div>
-    <div class="pv-legend-item"><div class="pv-legend-sw" style="background:#4f8ff7"></div><div class="pv-legend-t">Treatment being planned</div></div>
-    <div class="pv-legend-item"><div class="pv-legend-sw" style="background:#181e2c;border:1px dashed #3d4e68"></div><div class="pv-legend-t">Missing tooth</div></div>
+  <div class="tb-right">
+    <button class="btn" id="btnReset">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8a6 6 0 1 0 1.5-4"/><path d="M2 4v4h4"/></svg>
+      Reset
+    </button>
+    <button class="btn btn-accent" id="btnSave">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h8l2 2v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><rect x="5" y="11" width="6" height="3" rx=".5"/><rect x="5" y="3" width="6" height="3" rx=".5"/></svg>
+      Save Chart
+    </button>
   </div>
 </div>
 
-</div><!-- #panel -->
-</div><!-- #body -->
+<div class="shell">
+<!-- chart area -->
+<div class="chart-area">
 
-<!-- STATUS BAR -->
-<div id="sbar">
-  <span class="sdot"></span>
-  <span id="sb-main">Ready — load a GLB to begin</span>
-  <span class="ssep"></span>
-  <span id="sb-sel">No selection</span>
-  <div id="sbar-r">
-    <span class="sfps" id="sb-fps">— fps</span>
-    <span class="ssep"></span>
-    <span id="sb-geo">no model</span>
-    <span class="ssep"></span>
-    <span style="color:var(--t4)">DentaViz v1</span>
+  <div class="toolbar">
+    <label class="toggle-wrap" id="selAllWrap">
+      <div class="toggle" id="selAllToggle"></div>
+      <span>Select All Teeth</span>
+    </label>
   </div>
+
+  <div class="q-row"><div class="q-row-inner">
+    <div class="q-label right">Q1 Upper Left (11–18)</div>
+    <div class="q-label left">Q2 Upper Right (21–28)</div>
+  </div></div>
+
+  <div class="arch-label">Upper Arch — Maxillary</div>
+  <div class="arch-row" id="upper-row"></div>
+
+  <div class="midline"><span>Midline</span></div>
+
+  <div class="arch-row" id="lower-row"></div>
+  <div class="arch-label">Lower Arch — Mandibular</div>
+
+  <div class="q-row"><div class="q-row-inner">
+    <div class="q-label right">Q4 Lower Left (41–48)</div>
+    <div class="q-label left">Q3 Lower Right (31–38)</div>
+  </div></div>
+
+  <div class="legend" id="legend"></div>
 </div>
 
-</div><!-- #app -->
+<!-- side panel -->
+<div class="side">
+  <div class="side-header"><h3>Tooth Detail</h3></div>
 
-<!-- THREE.JS STACK — real loaders, real controls -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/environments/RoomEnvironment.js"></script>
+  <div class="side-empty" id="sideEmpty">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.4">
+      <circle cx="22" cy="22" r="18" stroke-dasharray="4 3"/>
+      <path d="M22 12c-4 0-7 2.5-7 5.5 0 1.6.7 3 2 3.9L16 34h5l1-4.5 1 4.5h5l-1-12.6c1.3-.9 2-2.3 2-3.9 0-3-3-5.5-7-5.5z"/>
+    </svg>
+    <p>Click any tooth to view and edit its clinical details.</p>
+  </div>
+
+  <div class="side-detail" id="sideDetail">
+    <div class="tooth-hero">
+      <div class="hero-canvas-wrap" id="heroWrap"></div>
+      <div class="hero-info">
+        <div class="hero-fdi" id="heroFdi">—</div>
+        <div class="hero-name" id="heroName">—</div>
+        <div id="heroBadge"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h4>Condition</h4>
+      <div class="cond-grid" id="condGrid"></div>
+    </div>
+    <div class="section">
+      <h4>Treatment Plan</h4>
+      <div class="tx-wrap" id="txWrap"></div>
+    </div>
+    <div class="section">
+      <h4>Mobility Grade</h4>
+      <div class="mob-row" id="mobRow"></div>
+    </div>
+    <div class="section">
+      <h4>Clinical Notes</h4>
+      <textarea class="note-box" id="noteBox" placeholder="Add clinical observation…" rows="3"></textarea>
+    </div>
+  </div>
+
+  <div class="side-actions" id="sideActions" style="display:none">
+    <button class="btn btn-accent btn-full" id="btnNext">Apply &amp; Next →</button>
+  </div>
+</div>
+</div>
+
+<div class="statsbar" id="statsbar"></div>
+</div>
+
 <script>
-'use strict';
-/* ════════════════════════════════════════════════════════════
-   DENTAVIZ v1 — STANDALONE HOSTED VIEWER
-   Clean architecture: load → parse → colour → interact
-   No overlays that can't be positioned correctly.
-   Selection = material emissive highlight only.
-   Gum = positioned from real tooth bounding boxes.
-════════════════════════════════════════════════════════════ */
-
-/* ── helpers ── */
-function $(id){return document.getElementById(id);}
-function text(id,v){var e=$(id);if(e)e.textContent=v;}
-function show(id){var e=$(id);if(e)e.style.display='block';}
-function hide(id){var e=$(id);if(e)e.style.display='none';}
-function showFlex(id){var e=$(id);if(e)e.style.display='flex';}
-function rgb(c){return 'rgb('+Math.round(c[0]*255)+','+Math.round(c[1]*255)+','+Math.round(c[2]*255)+')';}
-
-/* ── state ── */
-var S={
-  sel:null, ba:0,
-  gum:false, xray:false, roots:false, explode:false, wire:false,
-  teeth:{}, surfs:{},
-  mode:'plan',
-  phases:[], activity:[], relations:{}, filter:null,
-  patient:{name:'Demo Patient',chart:'',dob:''}
-};
-
-/* ── tooth data ── */
-var NAMES={
-  11:'Central incisor',12:'Lateral incisor',13:'Canine',14:'1st premolar',15:'2nd premolar',
-  16:'1st molar',17:'2nd molar',18:'3rd molar',
-  21:'Central incisor',22:'Lateral incisor',23:'Canine',24:'1st premolar',25:'2nd premolar',
-  26:'1st molar',27:'2nd molar',28:'3rd molar',
-  31:'Central incisor',32:'Lateral incisor',33:'Canine',34:'1st premolar',35:'2nd premolar',
-  36:'1st molar',37:'2nd molar',38:'3rd molar',
-  41:'Central incisor',42:'Lateral incisor',43:'Canine',44:'1st premolar',45:'2nd premolar',
-  46:'1st molar',47:'2nd molar',48:'3rd molar'
-};
-var QUADS={1:'Upper right · Q1',2:'Upper left · Q2',3:'Lower left · Q3',4:'Lower right · Q4'};
-var ALL=[11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,
-         31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48];
-function archOf(f){var q=(f/10)|0;return(q===1||q===2)?'upper':'lower';}
-function quadOf(f){return(f/10)|0;}
-
-/* ── DENTAL ADJACENCY / OPPOSING MAPS ── */
-var ARCH_ORDER_UPPER=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-var ARCH_ORDER_LOWER=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
-var ADJ={}; // fdi -> {mesial:fdi|null, distal:fdi|null}
-[ARCH_ORDER_UPPER,ARCH_ORDER_LOWER].forEach(function(order){
-  order.forEach(function(f,i){
-    ADJ[f]={mesial:order[i-1]||null, distal:order[i+1]||null};
-  });
-});
-var OPP={}; // fdi -> opposing fdi (occlusion partner)
-var OPPQ={1:4,2:3,3:2,4:1};
-ALL.forEach(function(f){
-  var q=quadOf(f), pos=f%10;
-  OPP[f]=OPPQ[q]*10+pos;
-});
-function adjacentOf(f){return [ADJ[f]?ADJ[f].mesial:null, ADJ[f]?ADJ[f].distal:null].filter(Boolean);}
-function opposingOf(f){return OPP[f]||null;}
-
-
-/* ── colour maps ── */
-// Condition base colours [r,g,b] linear
-var COND_C={
-  sound:    [.93,.90,.84],
-  caries:   [.36,.14,.05],
-  restored: [.72,.58,.26],
-  crown:    [.55,.62,.74],
-  missing:  [.08,.10,.16],
-  implant:  [.28,.50,.64],
-  unerupted:[.30,.32,.40]
-};
-var COND_R={sound:.38,caries:.82,restored:.32,crown:.12,missing:.92,implant:.22,unerupted:.58};
-var COND_M={sound:.0,caries:.0,restored:.12,crown:.32,implant:.82,unerupted:.0};
-
-// Treatment colours (for ba>50)
-var TX_C={
-  composite:[.02,.68,.82], crown_p:[.28,.55,.98], pfm:[.46,.56,.83],
-  extraction:[.96,.25,.37], implant_p:[.06,.85,.63], veneer:[.66,.55,.98],
-  endo:[.97,.62,.05], bridge:[.10,.56,.30], watch:[.44,.5,.62]
-};
-var TX_R={composite:.2,crown_p:.18,pfm:.25,extraction:.6,implant_p:.18,veneer:.15,endo:.3,bridge:.2,watch:.5};
-var TX_M={composite:.0,crown_p:.04,pfm:.38,extraction:.0,implant_p:.8,veneer:.05,endo:.0,bridge:.12,watch:.0};
-
-function getCol(f){
-  var s=S.teeth[f]||{}, cond=s.cond||'sound', tx=s.tx||'none';
-  if(S.ba>50 && tx!=='none' && TX_C[tx]) return{c:TX_C[tx],r:TX_R[tx]||.2,m:TX_M[tx]||0};
-  return{c:COND_C[cond]||COND_C.sound, r:COND_R[cond]||.38, m:COND_M[cond]||0};
-}
-
-/* ════ THREE.JS ENGINE ════ */
-var rnd,scn,cam,ctrl,clk,rc,ms,pmremGen;
-var MODEL=null;           // THREE.Group — loaded gltf root
-var TEETH={};             // fdi -> {mesh, mat, origC, pos, size}
-var GUM=null;             // THREE.Group
-var SEL_RING=null;        // unused — kept for compat
-var SEL_OUTLINE=null;     // outline clone of selected tooth
-var SEL_LIGHT=null;       // accent point light on selected tooth
-var ff=0,ft=0;
-var modelBox=new THREE.Box3(), modelCtr=new THREE.Vector3(), modelRad=1;
-var modelLoaded=false;
-var CONTACT_SHADOW=null;
-
-/* init */
-function makeStudioEnvTexture(){
-  /* Custom high-quality studio environment: soft gradient sky + two
-     bright softbox panels (front-top, side) for realistic enamel
-     highlights — sharper and more controllable than RoomEnvironment. */
-  var c=document.createElement('canvas'); c.width=1024; c.height=512;
-  var x=c.getContext('2d');
-
-  /* Base sky gradient — cool navy to soft warm horizon */
-  var g=x.createLinearGradient(0,0,0,512);
-  g.addColorStop(0.00,'#3a475f');
-  g.addColorStop(0.28,'#232d42');
-  g.addColorStop(0.55,'#141b2c');
-  g.addColorStop(1.00,'#0a0e18');
-  x.fillStyle=g; x.fillRect(0,0,1024,512);
-
-  /* Softbox panel 1 — large, warm-white, upper-left (key light source) */
-  var p1=x.createRadialGradient(300,110,10,300,110,220);
-  p1.addColorStop(0,'rgba(255,250,240,0.95)');
-  p1.addColorStop(0.4,'rgba(255,245,230,0.5)');
-  p1.addColorStop(1,'rgba(255,245,230,0)');
-  x.fillStyle=p1; x.fillRect(0,0,1024,512);
-
-  /* Softbox panel 2 — smaller, cool-white, upper-right (fill light source) */
-  var p2=x.createRadialGradient(760,150,5,760,150,170);
-  p2.addColorStop(0,'rgba(210,225,255,0.7)');
-  p2.addColorStop(0.5,'rgba(210,225,255,0.28)');
-  p2.addColorStop(1,'rgba(210,225,255,0)');
-  x.fillStyle=p2; x.fillRect(0,0,1024,512);
-
-  /* Rim strip — bright thin band low-right, mimics a rim/back light */
-  var p3=x.createRadialGradient(880,340,4,880,340,140);
-  p3.addColorStop(0,'rgba(180,210,255,0.55)');
-  p3.addColorStop(1,'rgba(180,210,255,0)');
-  x.fillStyle=p3; x.fillRect(0,0,1024,512);
-
-  /* Ground bounce — soft warm glow at the bottom (mimics floor reflection) */
-  var p4=x.createLinearGradient(0,420,0,512);
-  p4.addColorStop(0,'rgba(40,30,20,0)');
-  p4.addColorStop(1,'rgba(70,50,35,0.4)');
-  x.fillStyle=p4; x.fillRect(0,420,1024,92);
-
-  var tex=new THREE.CanvasTexture(c);
-  tex.mapping=THREE.EquirectangularReflectionMapping;
-  tex.encoding=THREE.sRGBEncoding;
-  return tex;
-}
-
-function initThree(){
-  var cv=$('cv'), vp=$('vp');
-  rnd=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
-  rnd.setPixelRatio(Math.min(devicePixelRatio,2));
-  rnd.outputEncoding=THREE.sRGBEncoding;
-  rnd.toneMapping=THREE.ACESFilmicToneMapping;
-  rnd.toneMappingExposure=1.15;
-  rnd.shadowMap.enabled=true;
-  rnd.shadowMap.type=THREE.PCFSoftShadowMap;
-  rnd.shadowMap.autoUpdate=true;
-
-  scn=new THREE.Scene();
-  scn.background=new THREE.Color(0x07090f);
-  scn.fog=new THREE.FogExp2(0x07090f,.018);
-
-  cam=new THREE.PerspectiveCamera(40,1,.01,2000);
-  cam.position.set(0,2,12);
-
-  clk=new THREE.Clock();
-  rc=new THREE.Raycaster();
-  ms=new THREE.Vector2(-9,-9);
-
-  /* Environment — custom studio softbox HDRI for crisp, realistic enamel
-     highlights (sharper specular response than the generic RoomEnvironment) */
-  pmremGen=new THREE.PMREMGenerator(rnd);
-  pmremGen.compileEquirectangularShader();
-  try{
-    var studioTex=makeStudioEnvTexture();
-    var envRT=pmremGen.fromEquirectangular(studioTex);
-    scn.environment=envRT.texture;
-    studioTex.dispose();
-  }catch(e){
-    try{
-      var roomEnv=new THREE.RoomEnvironment();
-      scn.environment=pmremGen.fromScene(roomEnv,0.04).texture;
-      roomEnv.dispose();
-    }catch(e2){
-      scn.add(new THREE.HemisphereLight(0xffffff,0x223344,0.9));
-    }
-  }
-
-  /* Lights — 4-point studio rig */
-  var key=new THREE.DirectionalLight(0xfff6ec,2.0);
-  key.position.set(5,11,7);
-  key.castShadow=true;
-  key.shadow.mapSize.set(4096,4096);
-  key.shadow.camera.near=0.5; key.shadow.camera.far=60;
-  key.shadow.camera.left=-10; key.shadow.camera.right=10;
-  key.shadow.camera.top=8; key.shadow.camera.bottom=-8;
-  key.shadow.bias=-0.00025;
-  key.shadow.normalBias=0.01;
-  key.shadow.radius=5;
-  scn.add(key);
-
-  var fill=new THREE.DirectionalLight(0xc5dcff,0.65);
-  fill.position.set(-8,4,-4); scn.add(fill);
-
-  var rim=new THREE.DirectionalLight(0xffffff,0.55);
-  rim.position.set(1,-2,-11); scn.add(rim);
-
-  var bounce=new THREE.DirectionalLight(0xffe8c8,0.22);
-  bounce.position.set(0,-6,3); scn.add(bounce);
-
-  var acc=new THREE.PointLight(0x8fb8ff,0.35,30,2);
-  acc.position.set(0,9,-2); scn.add(acc);
-
-  /* Floor */
-  var fl=new THREE.Mesh(
-    new THREE.PlaneGeometry(80,80),
-    new THREE.MeshStandardMaterial({color:0x060810,roughness:0.85,metalness:0.2})
-  );
-  fl.rotation.x=-Math.PI/2; fl.position.y=-8; fl.receiveShadow=true;
-  scn.add(fl);
-  var grid=new THREE.GridHelper(60,60,0x0f1728,0x0f1728);grid.position.y=-7.96;scn.add(grid);
-
-  /* Contact shadow — soft radial gradient disc under the arch for grounding,
-     visible even when the camera never sees the distant floor plane */
-  var csCanvas=document.createElement('canvas'); csCanvas.width=csCanvas.height=256;
-  var csx=csCanvas.getContext('2d');
-  var csg=csx.createRadialGradient(128,128,0,128,128,128);
-  csg.addColorStop(0,'rgba(0,0,0,0.55)');
-  csg.addColorStop(0.6,'rgba(0,0,0,0.22)');
-  csg.addColorStop(1,'rgba(0,0,0,0)');
-  csx.fillStyle=csg; csx.fillRect(0,0,256,256);
-  var csTex=new THREE.CanvasTexture(csCanvas);
-  CONTACT_SHADOW=new THREE.Mesh(
-    new THREE.PlaneGeometry(1,1),
-    new THREE.MeshBasicMaterial({map:csTex,transparent:true,depthWrite:false,opacity:0})
-  );
-  CONTACT_SHADOW.rotation.x=-Math.PI/2;
-  CONTACT_SHADOW.renderOrder=-1;
-  scn.add(CONTACT_SHADOW);
-
-  /* Selection highlight — scale-up outline mesh per selected tooth */
-  SEL_RING=null; // replaced by per-tooth outline in selTooth()
-  SEL_OUTLINE=null; // clone of selected tooth mesh scaled up + inverted normals
-
-  /* Orbit controls */
-  ctrl=new THREE.OrbitControls(cam,rnd.domElement);
-  ctrl.enableDamping=true; ctrl.dampingFactor=0.07;
-  ctrl.rotateSpeed=0.75; ctrl.zoomSpeed=0.85;
-  ctrl.minDistance=0.5; ctrl.maxDistance=500;
-  ctrl.enablePan=true; ctrl.panSpeed=0.6;
-
-  /* Events */
-  cv.addEventListener('mousemove',onMove);
-  cv.addEventListener('click',onClick);
-  cv.addEventListener('dblclick',onDblClick);
-  addEventListener('resize',resize);
-  addEventListener('keydown',onKey);
-
-  resize();
-  loop();
-}
-
-/* ── load GLB ── */
-function loadGLB(arrayBuffer, fileName){
-  var prog=$('ld-prog'), bar=$('ld-bar'), msg=$('ld-msg');
-  if(prog) prog.style.display='block';
-  if(bar) bar.style.width='60%';
-  if(msg) msg.textContent='Parsing with GLTFLoader…';
-
-  var loader=new THREE.GLTFLoader();
-  loader.parse(arrayBuffer,'',function(gltf){
-    if(bar) bar.style.width='85%';
-    if(msg) msg.textContent='Building scene…';
-
-    /* Remove old model */
-    if(MODEL){scn.remove(MODEL);MODEL=null;}
-    TEETH={};
-
-    MODEL=gltf.scene;
-    var totalTris=0;
-
-    /* Traverse: find all meshes, tag by parent node name (FDI).
-       HIDE jaw bone meshes — they are 3D-print sockets, not gum tissue.
-       Synthetic gum is built from tooth centroids instead. */
-    var JAW_NAMES=['upper_jaw','lowwer_jaw','lower_jaw','jaw','bone','socket'];
-    MODEL.traverse(function(node){
-      if(node.isMesh){
-        var nm=node.name.toLowerCase();
-        var isJaw=JAW_NAMES.some(function(j){ return nm.indexOf(j)>-1; });
-        if(isJaw){
-          node.visible=false; // hide bone mesh
-          return;
-        }
-        node.castShadow=true;
-        node.receiveShadow=true;
-        if(node.geometry && node.geometry.index)
-          totalTris+=node.geometry.index.count/3;
-        else if(node.geometry && node.geometry.attributes.position)
-          totalTris+=node.geometry.attributes.position.count/3;
-      }
-    });
-
-    /* Map FDI names — check node itself AND its parent chain */
-    MODEL.traverse(function(node){
-      var fdi=parseInt(node.name);
-      if(isNaN(fdi)||!NAMES[fdi]||TEETH[fdi]) return;
-      /* Find the first mesh under this node */
-      var meshNode=null;
-      if(node.isMesh) meshNode=node;
-      else node.traverse(function(c){if(c.isMesh&&!meshNode) meshNode=c;});
-      if(!meshNode) return;
-
-      /* Replace with MeshPhysicalMaterial for a realistic enamel clearcoat
-         sheen — carries over the original base colour and texture maps */
-      var origMat=Array.isArray(meshNode.material)?meshNode.material[0]:meshNode.material;
-      var mat=new THREE.MeshPhysicalMaterial({
-        color: origMat.color ? origMat.color.clone() : new THREE.Color(0xf0ece0),
-        map: origMat.map || null,
-        normalMap: origMat.normalMap || null,
-        roughness: 0.32,
-        metalness: 0.0,
-        clearcoat: 0.55,
-        clearcoatRoughness: 0.18,
-        envMapIntensity: 1.35,
-        reflectivity: 0.5
-      });
-      meshNode.material=mat;
-
-      /* Compute world bounding box AFTER model is in scene */
-      TEETH[fdi]={mesh:meshNode, mat:mat, origC:mat.color?mat.color.clone():new THREE.Color(1,1,1)};
-    });
-
-    scn.add(MODEL);
-
-    /* Compute bounding boxes (after adding to scene so world transforms apply) */
-    modelBox.setFromObject(MODEL);
-    modelBox.getCenter(modelCtr);
-    var sz=new THREE.Vector3(); modelBox.getSize(sz);
-    modelRad=Math.max(sz.x,sz.y,sz.z)*0.5;
-
-    /* Per-tooth bounding boxes */
-    Object.keys(TEETH).forEach(function(f){
-      var t=TEETH[f];
-      var box=new THREE.Box3().setFromObject(t.mesh);
-      var c=new THREE.Vector3(); box.getCenter(c);
-      var s=new THREE.Vector3(); box.getSize(s);
-      t.pos=c.clone();
-      t.size=s.clone();
-      t.rxy=Math.max(s.x,s.z)*0.5;
-    });
-
-    var mapped=Object.keys(TEETH).length;
-    modelLoaded=true;
-
-    /* Ground the model with a soft contact shadow disc */
-    if(CONTACT_SHADOW){
-      var span=Math.max(sz.x,sz.z)*1.6;
-      CONTACT_SHADOW.scale.set(span,span,1);
-      CONTACT_SHADOW.position.set(modelCtr.x, modelBox.min.y-modelRad*0.08, modelCtr.z);
-      CONTACT_SHADOW.material.opacity=0.5;
-    }
-
-    /* Apply treatment colours (demo seed) */
-    applyAll();
-    buildGum();
-    frameModel();
-
-    /* Update UI */
-    if(bar) bar.style.width='100%';
-    if(msg) msg.textContent='✓ '+mapped+' teeth · '+Math.round(totalTris).toLocaleString()+' tris';
-    setTimeout(function(){hide('ld-overlay');},600);
-
-    showFlex('badge');
-    text('badge-txt','Real anatomy · '+mapped+' teeth · '+Math.round(totalTris).toLocaleString()+' tris');
-    text('ro-model',(fileName||'').replace(/\.(glb|gltf)$/i,''));
-    text('ro-teeth',String(mapped));
-    text('ro-tris',Math.round(totalTris).toLocaleString());
-    text('sb-geo','real GLB · '+mapped+' teeth');
-    text('sb-main',(fileName||'model')+' loaded — click any tooth');
-
-  },function(err){
-    console.error('GLTFLoader error:',err);
-    if(msg) msg.textContent='❌ Failed: '+(err&&err.message||String(err));
-  });
-}
-
-/* ── frame camera to model ── */
-function frameModel(){
-  var d=modelRad/Math.tan(cam.fov*Math.PI/360)*1.45;
-  ctrl.target.copy(modelCtr);
-  cam.position.set(modelCtr.x, modelCtr.y+modelRad*0.22, modelCtr.z+d*1.05);
-  cam.near=modelRad*0.005; cam.far=modelRad*80;
-  cam.updateProjectionMatrix();
-  ctrl.update();
-}
-
-/* ── apply colours ── */
-function applyOne(f){
-  var t=TEETH[f]; if(!t) return;
-  var s=S.teeth[f]||{}, c=getCol(f);
-  var mat=t.mat;
-
-  /* Base colour — clearcoat stays constant (that's the "wet enamel" sheen);
-     only the base roughness/colour shifts per condition */
-  if(s.cond==='sound'&&(!s.tx||s.tx==='none')){
-    mat.color.copy(t.origC);
-    mat.roughness=0.32; mat.metalness=0.0;
-    mat.clearcoat=0.55; mat.clearcoatRoughness=0.18;
-  } else {
-    mat.color.setRGB(c.c[0],c.c[1],c.c[2]);
-    mat.roughness=c.r; mat.metalness=c.m;
-    /* Crowns/restorations get a glossier clearcoat (porcelain/ceramic look);
-       caries and missing get none (organic matte decay look) */
-    if(s.cond==='crown'||s.cond==='restored'||(s.tx&&s.tx!=='none')){
-      mat.clearcoat=0.7; mat.clearcoatRoughness=0.08;
-    } else {
-      mat.clearcoat=0.15; mat.clearcoatRoughness=0.4;
-    }
-  }
-
-  /* X-ray — ghost teeth */
-  mat.transparent = S.xray||false;
-  mat.opacity     = S.xray ? 0.22 : 1.0;
-  mat.depthWrite  = !S.xray;
-  if(S.xray){
-    mat.color.setRGB(0.65,0.85,1.0);
-    mat.roughness=0.04; mat.metalness=0.0;
-    if(mat.clearcoat!=null){ mat.clearcoat=0.6; mat.clearcoatRoughness=0.05; }
-    if(mat.emissive) mat.emissive.setRGB(0.06,0.15,0.28);
-    mat.side=THREE.DoubleSide;
-  } else {
-    mat.side=THREE.FrontSide;
-    if(mat.emissive && S.sel!==f) mat.emissive.setRGB(0,0,0);
-  }
-
-  /* Wireframe */
-  mat.wireframe=S.wire;
-
-  /* Missing — hide mesh */
-  t.mesh.visible = (s.cond!=='missing');
-
-  /* Emissive highlight for treatments (subtle, not halos) */
-  if(mat.emissive){
-    var hasTx=s.tx&&s.tx!=='none';
-    if(hasTx && S.ba<50 && TX_C[s.tx]){
-      var tc=TX_C[s.tx];
-      mat.emissive.setRGB(tc[0]*0.12, tc[1]*0.12, tc[2]*0.12);
-    } else {
-      mat.emissive.setRGB(0,0,0);
-    }
-  }
-
-  mat.needsUpdate=true;
-
-  /* Explode — animate each tooth radially outward */
-  if(t.mesh && t.mesh.parent && t.pos){
-    var node=t.mesh.parent;
-    if(t.homePos===undefined){
-      t.homePos=node.position.clone();
-    }
-    if(S.explode){
-      var dx=t.pos.x-modelCtr.x, dy=t.pos.y-modelCtr.y, dz=t.pos.z-modelCtr.z;
-      var len=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
-      var factor=modelRad*0.85;
-      /* Primary radial push + slight vertical separation */
-      var archY = archOf(f)==='upper' ? modelRad*0.3 : -modelRad*0.3;
-      node.position.x=t.homePos.x+dx/len*factor;
-      node.position.y=t.homePos.y+dy/len*factor*0.4+archY;
-      node.position.z=t.homePos.z+dz/len*factor;
-    } else {
-      node.position.copy(t.homePos);
-    }
-  }
-}
-function applyAll(){ALL.forEach(applyOne);}
-
-/* ── gum tissue ── */
-function buildGum(){
-  if(GUM){scn.remove(GUM);GUM.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});GUM=null;}
-  if(!S.gum||!modelLoaded) return;
-  if(Object.keys(TEETH).length===0) return; /* no teeth mapped yet */
-
-  var gumMat=new THREE.MeshPhysicalMaterial({
-    color:new THREE.Color(0.88,0.52,0.58),
-    roughness:0.55, metalness:0.0,
-    clearcoat:0.45, clearcoatRoughness:0.28,
-    envMapIntensity:0.6,
-    transparent: S.roots,
-    opacity: S.roots ? 0.28 : 1.0,
-    depthWrite: !S.roots
-  });
-
-  /* Build gum spine from tooth centroids at the CERVICAL level.
-     Upper teeth: cervical is at bottom of tooth (min Y of bounding box).
-     Lower teeth: cervical is at top of tooth (max Y of bounding box).
-     Gum tube follows those points + small inward offset. */
-  /* Build gum from actual tooth bounding boxes.
-     Cervical margin = bottom of upper teeth / top of lower teeth.
-     Use BOTH a tube AND a flat pad to look like real soft tissue. */
-  function makeGumLine(fdis, arch){
-    var pts=[];
-    fdis.forEach(function(f){
-      var t=TEETH[f]; if(!t||!t.mesh) return;
-      var box=new THREE.Box3().setFromObject(t.mesh);
-      /* Cervical Y: where gum meets tooth — 20% up from crown tip */
-      var cervY = arch==='upper'
-        ? box.min.y + (box.max.y-box.min.y)*0.18
-        : box.max.y - (box.max.y-box.min.y)*0.18;
-      pts.push(new THREE.Vector3(t.pos.x, cervY, t.pos.z));
-    });
-    if(pts.length<3) return null;
-    pts.sort(function(a,b){return a.x-b.x;});
-    return new THREE.CatmullRomCurve3(pts,false,'catmullrom',0.4);
-  }
-
-  var upperFDIs=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-  var lowerFDIs=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
-
-  GUM=new THREE.Group();
-  /* Tube radius = 3.5% of model radius — tight, anatomical */
-  var tubeR=modelRad*0.035;
-
-  var archDefs=[
-    {fdis:upperFDIs, arch:'upper'},
-    {fdis:lowerFDIs, arch:'lower'}
-  ];
-
-  archDefs.forEach(function(def){
-    var curve=makeGumLine(def.fdis, def.arch);
-    if(!curve) return;
-
-    /* Labial/buccal gum tube — the visible gum line */
-    var tube=new THREE.TubeGeometry(curve,120,tubeR,18,false);
-    var m=new THREE.Mesh(tube,gumMat.clone());
-    m.castShadow=true; m.receiveShadow=true;
-    GUM.add(m);
-
-    /* Palatal/lingual tube — gives depth to gum tissue */
-    /* Offset points slightly inward (toward arch center) */
-    var innerPts=curve.points.map(function(p){
-      var dx=p.x-modelCtr.x, dz=p.z-modelCtr.z;
-      var len=Math.sqrt(dx*dx+dz*dz)||1;
-      var inset=modelRad*0.04;
-      return new THREE.Vector3(p.x-dx/len*inset, p.y, p.z-dz/len*inset);
-    });
-    var innerCurve=new THREE.CatmullRomCurve3(innerPts,false,'catmullrom',0.4);
-    var innerTube=new THREE.TubeGeometry(innerCurve,120,tubeR*0.7,14,false);
-    var mi=new THREE.Mesh(innerTube,gumMat.clone());
-    mi.castShadow=true; mi.receiveShadow=true;
-    GUM.add(mi);
-  });
-
-  scn.add(GUM);
-}
-
-/* ── render loop ── */
-function loop(){
-  requestAnimationFrame(loop);
-  var t=clk.getElapsedTime();
-
-  if(ctrl) ctrl.update();
-
-  /* Pulse emissive on selected tooth */
-  if(S.sel && TEETH[S.sel] && TEETH[S.sel].mat && TEETH[S.sel].mat.emissive){
-    var pulse=0.1+Math.sin(t*3.2)*0.06;
-    TEETH[S.sel].mat.emissive.setRGB(pulse,pulse*2.5,pulse*5.5);
-  }
-
-  /* FPS */
-  ff++;
-  var now=performance.now();
-  if(now-ft>1000){ text('sb-fps',Math.round(ff*1000/(now-ft))+' fps'); ff=0; ft=now; }
-
-  rnd.render(scn,cam);
-}
-
-/* ── resize ── */
-function resize(){
-  var vp=$('vp'), w=vp.clientWidth, h=vp.clientHeight;
-  if(!rnd||!w||!h) return;
-  rnd.setSize(w,h,false);
-  cam.aspect=w/h; cam.updateProjectionMatrix();
-}
-
-/* ── raycasting ── */
-var hovFdi=null;
-function pick(e){
-  var vp=$('vp'), r=vp.getBoundingClientRect();
-  ms.x=((e.clientX-r.left)/r.width)*2-1;
-  ms.y=-((e.clientY-r.top)/r.height)*2+1;
-  rc.setFromCamera(ms,cam);
-  var meshes=Object.values(TEETH).map(function(t){return t.mesh;}).filter(function(m){return m&&m.visible;});
-  var hits=rc.intersectObjects(meshes,false);
-  if(hits.length){
-    for(var f in TEETH){ if(TEETH[f].mesh===hits[0].object) return parseInt(f); }
-  }
-  return null;
-}
-
-function onMove(e){
-  var f=pick(e);
-  if(f!==null){
-    hovFdi=f;
-    showTip(f,e);
-    $('cv').style.cursor='pointer';
-  } else {
-    hovFdi=null;
-    hide('tip');
-    $('cv').style.cursor='default';
-  }
-}
-function onClick(e){ if(hovFdi!==null) selTooth(hovFdi); else clearSel(); }
-function onDblClick(e){ if(hovFdi!==null) zoomTo(hovFdi); }
-
-function showTip(f,e){
-  var s=S.teeth[f]||{};
-  var vp=$('vp'), r=vp.getBoundingClientRect();
-  text('tip-fdi',String(f));
-  text('tip-nm',NAMES[f]||'—');
-  var cond=s.cond||'sound';
-  var condEl=$('tip-cond');
-  if(condEl) condEl.innerHTML='<span class="tip-dot" style="background:'+rgb(COND_C[cond]||COND_C.sound)+'"></span>'+cond;
-  var hasTx=s.tx&&s.tx!=='none';
-  var txRow=$('tip-tx-row');
-  if(txRow) txRow.style.display=hasTx?'flex':'none';
-  if(hasTx) text('tip-tx','→ '+s.tx.replace(/_p/,'').replace(/_/,' '));
-  var tip=$('tip');
-  if(tip){
-    tip.style.display='block';
-    var x=e.clientX-r.left, y=e.clientY-r.top;
-    tip.style.left=Math.min(x+16,vp.clientWidth-190)+'px';
-    tip.style.top=Math.max(8,y-50)+'px';
-  }
-}
-
-/* ── selection ── */
-function selTooth(f){
-  /* Clear emissive on previously selected tooth */
-  if(S.sel && S.sel!==f && TEETH[S.sel] && TEETH[S.sel].mat && TEETH[S.sel].mat.emissive){
-    TEETH[S.sel].mat.emissive.setRGB(0,0,0);
-  }
-  S.sel=f;
-  var t=TEETH[f];
-
-  /* Outline selection — remove old, build new */
-  if(SEL_OUTLINE){ scn.remove(SEL_OUTLINE); SEL_OUTLINE=null; }
-  if(t && t.mesh && t.mesh.geometry){
-    var outMat=new THREE.MeshBasicMaterial({
-      color:0x60a5fa, side:THREE.BackSide,
-      transparent:true, opacity:0.85, depthWrite:false
-    });
-    SEL_OUTLINE=new THREE.Mesh(t.mesh.geometry, outMat);
-    SEL_OUTLINE.renderOrder=5;
-    SEL_OUTLINE.scale.setScalar(1.045); // 4.5% bigger = clean outline
-    /* Copy world transform of the mesh */
-    t.mesh.getWorldPosition(SEL_OUTLINE.position);
-    t.mesh.getWorldQuaternion(SEL_OUTLINE.quaternion);
-    t.mesh.getWorldScale(new THREE.Vector3())
-      .multiplyScalar(1.045);
-    /* Simpler: add as child of mesh parent so transforms sync */
-    if(t.mesh.parent){
-      t.mesh.parent.add(SEL_OUTLINE);
-      SEL_OUTLINE.position.set(0,0,0);
-      SEL_OUTLINE.quaternion.identity();
-    } else {
-      scn.add(SEL_OUTLINE);
-      SEL_OUTLINE.position.copy(t.pos||new THREE.Vector3());
-    }
-    /* Bright accent light at selected tooth */
-  if(SEL_LIGHT){ scn.remove(SEL_LIGHT); SEL_LIGHT=null; }
-  if(t && t.pos){
-    SEL_LIGHT=new THREE.PointLight(0x60a5fa, 2.5, modelRad*0.8, 2);
-    SEL_LIGHT.position.copy(t.pos);
-    SEL_LIGHT.position.y += modelRad*0.1;
-    scn.add(SEL_LIGHT);
-  }
-  /* Also emit emissive glow on the tooth */
-    if(t.mat && t.mat.emissive) t.mat.emissive.setRGB(0.1,0.25,0.55);
-  }
-
-  /* Panel */
-  var s=S.teeth[f]||{}, q=quadOf(f);
-  hide('te-empty'); show('te-editor');
-  text('te-fdi',String(f));
-  text('te-nm',NAMES[f]||'—');
-  text('te-sub',QUADS[q]||'—');
-  $('te-cond').value=s.cond||'sound';
-  $('te-tx').value=s.tx||'none';
-  $('te-note').value=s.note||'';
-  setSeg('mob',s.mob||'0');
-
-  /* Badge */
-  var bdg=$('te-badge');
-  if(s.tx&&s.tx!=='none'&&TX_C[s.tx]){
-    var tc=TX_C[s.tx]; var ri=(tc[0]*255)|0, gi=(tc[1]*255)|0, bi=(tc[2]*255)|0;
-    bdg.style.cssText='display:inline-flex;background:rgba('+ri+','+gi+','+bi+',.16);color:rgb('+Math.min(255,ri+70)+','+Math.min(255,gi+70)+','+Math.min(255,bi+70)+');border:1px solid rgba('+ri+','+gi+','+bi+',.4)';
-    bdg.textContent='→ '+s.tx.replace(/_p/,'').replace(/_/,' ');
-  } else { bdg.style.display='none'; }
-
-  updSurf(f);
-
-  /* HUD */
-  showFlex('hud');
-  text('hud-fdi',String(f));
-  text('hud-name',NAMES[f]||'—');
-  text('hud-arch',QUADS[q]||'—');
-  var condEl=$('hud-cond');
-  if(condEl) condEl.innerHTML='<span class="hud-dot" style="background:'+rgb(COND_C[s.cond||'sound']||COND_C.sound)+'"></span>'+(s.cond||'sound');
-  var txEl=$('hud-tx');
-  if(txEl){ txEl.textContent=s.tx&&s.tx!=='none'?'→ '+s.tx.replace(/_/,' '):'—'; txEl.style.color=s.tx&&s.tx!=='none'?'var(--acs)':'var(--t3)'; }
-
-  text('sb-sel','FDI '+f+' · '+(NAMES[f]||''));
-
-  renderRelated(f);
-  if(S.mode==='patient') renderPatientTooth(f);
-
-  /* Switch to tooth tab */
-  setPTab(document.querySelectorAll('.ptab')[1],'tooth');
-}
-
-window.clearSel=function(){
-  S.sel=null;
-  if(SEL_OUTLINE){ if(SEL_OUTLINE.parent) SEL_OUTLINE.parent.remove(SEL_OUTLINE); else scn.remove(SEL_OUTLINE); SEL_OUTLINE=null; }
-  if(SEL_LIGHT){ scn.remove(SEL_LIGHT); SEL_LIGHT=null; }
-  /* Remove emissive from previously selected tooth */
-  if(S.sel && TEETH[S.sel] && TEETH[S.sel].mat && TEETH[S.sel].mat.emissive) TEETH[S.sel].mat.emissive.setRGB(0,0,0);
-  hide('hud'); hide('te-editor'); show('te-empty');
-  text('sb-sel','No selection');
-  try{ parent.postMessage({type:'dv:clearSel'},'*'); }catch(ex){}
-};
-
-/* ── zoom to tooth ── */
-function zoomTo(f){
-  var t=TEETH[f]; if(!t||!t.pos) return;
-  var p=t.pos, d=Math.max(t.rxy||1,modelRad*0.12)*3.5;
-  var from={r:ctrl.object.position.clone(), tgt:ctrl.target.clone()};
-  var toPos=new THREE.Vector3(p.x+d*0.4, p.y+d*0.3, p.z+d*0.8);
-  var step=0, n=30;
-  var id=setInterval(function(){
-    step++;
-    var e=1-Math.pow(1-step/n,3);
-    cam.position.lerpVectors(from.r,toPos,e);
-    ctrl.target.lerpVectors(from.tgt,p,e);
-    cam.lookAt(ctrl.target);
-    if(step>=n)clearInterval(id);
-  },16);
-}
-
-/* ── surface diagram ── */
-var SURF_FILL={hit:'#f43f5e',proposed:'#4f8ff7',null:'#161e2e'};
-var SURF_STROKE={hit:'#fb7185',proposed:'#7db3ff',null:'#243358'};
-function updSurf(f){
-  var surfs=S.surfs[f]||{};
-  ['b','l','m','d','o'].forEach(function(s){
-    var el=$('sz'+s); if(!el) return;
-    var v=surfs[s]||'null';
-    el.setAttribute('fill',SURF_FILL[v]||SURF_FILL.null);
-    el.setAttribute('stroke',SURF_STROKE[v]||SURF_STROKE.null);
-  });
-}
-window.tSurf=function(s){
-  if(!S.sel) return;
-  if(!S.surfs[S.sel]) S.surfs[S.sel]={};
-  var cur=S.surfs[S.sel][s]||'null';
-  S.surfs[S.sel][s]=cur==='null'?'hit':cur==='hit'?'proposed':'null';
-  updSurf(S.sel);
-};
-
-/* ── live update & save ── */
-window.liveUp=function(){
-  if(!S.sel) return;
-  if(!S.teeth[S.sel]) S.teeth[S.sel]={};
-  S.teeth[S.sel].cond=$('te-cond').value;
-  S.teeth[S.sel].tx=$('te-tx').value;
-  applyOne(S.sel);
-  updStats(); updCount();
-  selTooth(S.sel); /* refresh panel */
-};
-window.saveTooth=function(){
-  if(!S.sel) return;
-  if(!S.teeth[S.sel]) S.teeth[S.sel]={};
-  var t=S.teeth[S.sel];
-  var prevCond=t.cond, prevTx=t.tx;
-  t.cond=$('te-cond').value; t.tx=$('te-tx').value; t.note=$('te-note').value;
-  var mobOn=document.querySelector('#te-mob .seg-o.on');
-  if(mobOn) t.mob=mobOn.dataset.val||'0';
-  applyOne(S.sel); updStats(); updCount();
-  logActivity(S.sel, prevCond, prevTx, t.cond, t.tx);
-  renderAdvisories();
-  if(S.filter) renderFilteredChips();
-  if(S.mode==='stages') renderPhases();
-  if(S.mode==='ba') renderCompare();
-  var btn=$('btn-save');
-  btn.classList.add('ok');
-  btn.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Saved';
-  setTimeout(function(){
-    btn.classList.remove('ok');
-    btn.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Changes';
-  },1600);
-
-  /* postMessage to Bubble parent */
-  try{ parent.postMessage({
-    type:'dv:tooth', fdi:S.sel,
-    name: NAMES[S.sel]||'', cond:t.cond, tx:t.tx, note:t.note,
-    mob: t.mob||'0', arch: archOf(S.sel), quad: quadOf(S.sel)
-  },'*'); emitStats(); }catch(e){}
-};
-
-/* ── segmented control ── */
-window.pickSeg=function(el,key,val){
-  el.parentElement.querySelectorAll('.seg-o').forEach(function(o){o.classList.remove('on');});
-  el.classList.add('on');
-  if(S.sel){if(!S.teeth[S.sel])S.teeth[S.sel]={};S.teeth[S.sel][key]=val;}
-};
-function setSeg(key,val){
-  var container=$('te-'+key); if(!container) return;
-  container.querySelectorAll('.seg-o').forEach(function(o,i){
-    o.classList.toggle('on',o.dataset.val===val||(['0','1','2','3'][i]===val));
-  });
-}
-
-/* ── BA slider ── */
-window.onBA=function(v){
-  S.ba=v;
-  text('ba-pct',v+'%');
-  var inp=$('ba-range');
-  if(inp) inp.style.background='linear-gradient(90deg,var(--ac) '+v+'%,var(--sf3) '+v+'%)';
-  $('ba-cur').style.color=v<50?'var(--t2)':'var(--t4)';
-  $('ba-aft').style.color=v>=50?'var(--acs)':'var(--t4)';
-  applyAll();
-};
-
-/* ── view toggles ── */
-window.tgl=function(opt,el){
-  S[opt]=!S[opt]; el.classList.toggle('on',S[opt]);
-  if(opt==='gum'){
-    buildGum();
-  } else if(opt==='xray'){
-    scn.background.set(S.xray?0x000c1a:0x07090f);
-    if(scn.fog){ scn.fog.color.set(S.xray?0x001830:0x07090f); scn.fog.density=S.xray?0.008:0.018; }
-    rnd.sortObjects=true; /* always sort for correct transparency */
-    /* Dim main lights in xray mode for cleaner look */
-    scn.traverse(function(o){ if(o.isDirectionalLight){ o.userData._baseInt=o.userData._baseInt||o.intensity; o.intensity=S.xray?o.userData._baseInt*0.4:o.userData._baseInt; } });
-    applyAll();
-  } else if(opt==='roots'){
-    if(GUM){ GUM.traverse(function(o){
-      if(o.isMesh){
-        o.material.transparent=S.roots;
-        o.material.opacity=S.roots?0.28:1.0;
-        o.material.depthWrite=!S.roots;
-        o.material.needsUpdate=true;
-      }
-    }); }
-    /* Also show gum if roots requested */
-    if(S.roots && !S.gum){
-      S.gum=true;
-      buildGum();
-      if(GUM){ GUM.traverse(function(o){
-        if(o.isMesh){ o.material.transparent=true; o.material.opacity=0.28; o.material.depthWrite=false; o.material.needsUpdate=true; }
-      }); }
-    }
-  } else if(opt==='explode'){
-    applyAll();
-    buildGum(); /* reposition gum with exploded teeth */
-  } else {
-    applyAll();
-  }
-};
-
-/* ── camera presets ── */
-window.camGo=function(v,el){
-  document.querySelectorAll('.cb').forEach(function(c){c.classList.remove('on');});
-  if(el) el.classList.add('on');
-  if(!modelLoaded) return;
-  var d=modelRad/Math.tan(cam.fov*Math.PI/360)*1.55;
-  var c=modelCtr;
-  var toPos,toTgt=c.clone();
-  if(v==='front')  toPos=new THREE.Vector3(c.x, c.y+modelRad*0.15, c.z+d);
-  else if(v==='top')   toPos=new THREE.Vector3(c.x, c.y+d*1.2, c.z);
-  else if(v==='btm')   toPos=new THREE.Vector3(c.x, c.y-d*1.2, c.z);
-  else if(v==='left')  toPos=new THREE.Vector3(c.x-d, c.y, c.z);
-  else if(v==='right') toPos=new THREE.Vector3(c.x+d, c.y, c.z);
-  else toPos=new THREE.Vector3(c.x+d*0.45, c.y+modelRad*0.38, c.z+d*0.8);
-  var from=cam.position.clone(), fromTgt=ctrl.target.clone();
-  var step=0, n=30;
-  var id=setInterval(function(){
-    step++;var e=1-Math.pow(1-step/n,3);
-    cam.position.lerpVectors(from,toPos,e);
-    ctrl.target.lerpVectors(fromTgt,toTgt,e);
-    cam.lookAt(ctrl.target);
-    ctrl.update();
-    if(step>=n)clearInterval(id);
-  },16);
-};
-
-/* ── keyboard ── */
-function onKey(e){
-  var k=e.key;
-  if(k==='f'||k==='F') camGo('front');
-  else if(k==='t'||k==='T') camGo('top');
-  else if(k==='l'||k==='L') camGo('left');
-  else if(k==='r'||k==='R') camGo('right');
-  else if(k==='Escape') clearSel();
-}
-
-/* ── stats ── */
-function updStats(){
-  var vs=Object.values(S.teeth);
-  var ca=vs.filter(function(t){return t.cond==='caries';}).length;
-  var mi=vs.filter(function(t){return t.cond==='missing';}).length;
-  var pl=vs.filter(function(t){return t.tx&&t.tx!=='none';}).length;
-  text('st-sound',String(Math.max(0,32-ca-mi)));
-  text('st-caries',String(ca));
-  text('st-plan',String(pl));
-  text('st-miss',String(mi));
-  buildStageList();
-  renderAdvisories();
-  if(S.mode==='patient') renderPatientSummary();
-}
-function updCount(){
-  var c=Object.keys(S.teeth).filter(function(k){
-    var t=S.teeth[k]; return t&&((t.cond&&t.cond!=='sound')||(t.tx&&t.tx!=='none'));
-  }).length;
-  text('changepill',c+' change'+(c!==1?'s':''));
-}
-function buildStageList(){
-  var ext=Object.keys(S.teeth).filter(function(k){return S.teeth[k].tx==='extraction';});
-  var rest=Object.keys(S.teeth).filter(function(k){return['composite','crown_p','pfm','veneer','endo'].indexOf(S.teeth[k].tx)>-1;});
-  var imp=Object.keys(S.teeth).filter(function(k){return S.teeth[k].tx==='implant_p';});
-  var stages=[
-    {n:1,t:'Examination',d:'Charting · radiographs · photographs',tags:[],act:true},
-    {n:2,t:'Extractions',d:ext.length?'Remove non-restorable':'None planned',tags:ext,act:ext.length>0},
-    {n:3,t:'Restorations & RCT',d:rest.length?'Fillings, crowns, endodontics':'None planned',tags:rest,act:rest.length>0},
-    {n:4,t:'Implant surgery',d:imp.length?'Placement & healing':'None planned',tags:imp,act:imp.length>0},
-    {n:5,t:'Final delivery',d:'Crown seating · occlusal check · polish',tags:[],act:false}
-  ];
-  var el=$('stage-list'); if(!el) return;
-  el.innerHTML=stages.map(function(s){
-    return '<div class="stage'+(s.act?' act':'')+'">'
-      +'<div class="stage-line"></div>'
-      +'<div class="stage-dot">'+s.n+'</div>'
-      +'<div class="stage-body">'
-        +'<div class="stage-t">'+s.t+'</div>'
-        +'<div class="stage-d">'+s.d+'</div>'
-        +(s.tags.length?'<div class="stage-tags">'+s.tags.slice(0,10).map(function(x){return'<span class="ftag">'+x+'</span>';}).join('')+'</div>':'')
-      +'</div>'
-    +'</div>';
-  }).join('');
-}
-
-/* ── navigation / panel tabs ── */
-window.setNav=function(el,mode){
-  document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on');});
-  el.classList.add('on'); S.mode=mode;
-
-  /* Show the right mode container, hide the rest */
-  ['plan','stages','ba','patient'].forEach(function(m){
-    var c=$('mode-'+m); if(c) c.style.display=(m===mode)?(m==='plan'?'flex':'block'):'none';
-  });
-
-  /* View tools only make sense in Treatment Plan mode */
-  var vt=$('vtools'); if(vt){ vt.style.opacity=(mode==='plan')?'1':'0'; vt.style.pointerEvents=(mode==='plan')?'auto':'none'; }
-
-  if(mode==='stages') renderPhases();
-  if(mode==='ba'){ $('ba-range').value=50; onBA(50); renderCompare(); }
-  if(mode==='patient'){ renderPatientSummary(); if(S.sel) renderPatientTooth(S.sel); }
-};
-window.setPTab=function(el,id){
-  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});
-  if(el) el.classList.add('on');
-  ['ov','tooth','legend','activity'].forEach(function(x){
-    var p=$('pane-'+x); if(p) p.style.display=x===id?'block':'none';
-  });
-  if(id==='activity') renderActivity();
-};
-
-/* ── reset ── */
-window.resetAll=function(){
-  S.teeth={}; S.surfs={}; S.sel=null; S.ba=0;
-  var br=$('ba-range'); if(br){br.value=0;onBA(0);}
-  clearSel(); applyAll(); updStats(); updCount();
-};
-
-/* ── loader UI ── */
-window.openLoader=function(){ show('ld-overlay'); };
-window.handleFile=function(file){
-  if(!file) return;
-  var prog=$('ld-prog'), bar=$('ld-bar'), msg=$('ld-msg');
-  if(prog) prog.style.display='block';
-  if(msg) msg.textContent='Reading '+file.name+'…';
-  if(bar) bar.style.width='15%';
-  var reader=new FileReader();
-  reader.onprogress=function(e){
-    if(e.lengthComputable&&bar) bar.style.width=(15+e.loaded/e.total*40)+'%';
-  };
-  reader.onload=function(ev){
-    loadGLB(ev.target.result, file.name);
-  };
-  reader.readAsArrayBuffer(file);
-};
-window.skipToDemo=function(){
-  hide('ld-overlay');
-  text('sb-main','Demo mode — no model loaded. Click Load Model to add your GLB.');
-  text('sb-geo','no model');
-};
-
-/* Drag-and-drop on the drop zone */
 (function(){
-  var dz=$('ld-dz');
-  if(!dz) return;
-  ['dragover','dragenter'].forEach(function(ev){
-    dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('drag');});
+'use strict';
+
+/* ── Data ── */
+var CONDS = [
+  {key:'sound',    label:'Sound',    color:'#16a34a'},
+  {key:'caries',   label:'Caries',   color:'#dc2626'},
+  {key:'restored', label:'Restored', color:'#d97706'},
+  {key:'crown',    label:'Crown',    color:'#7c3aed'},
+  {key:'missing',  label:'Missing',  color:'#64748b'},
+  {key:'implant',  label:'Implant',  color:'#0891b2'},
+  {key:'unerupted',label:'Unerupted',color:'#94a3b8'},
+  {key:'watch',    label:'Watch',    color:'#ea580c'},
+];
+
+var TXS = [
+  {key:'none',label:'None'},{key:'composite',label:'Composite'},
+  {key:'crown_p',label:'Crown'},{key:'pfm',label:'PFM'},
+  {key:'extraction',label:'Extraction'},{key:'implant_p',label:'Implant Plan'},
+  {key:'veneer',label:'Veneer'},{key:'endo',label:'Endo'},
+  {key:'bridge',label:'Bridge'},{key:'watch',label:'Monitor'},
+];
+
+var UPPER=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+var LOWER=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+
+var NAMES={
+  11:'Central Incisor',12:'Lateral Incisor',13:'Canine',14:'1st Premolar',
+  15:'2nd Premolar',16:'1st Molar',17:'2nd Molar',18:'Wisdom Tooth',
+  21:'Central Incisor',22:'Lateral Incisor',23:'Canine',24:'1st Premolar',
+  25:'2nd Premolar',26:'1st Molar',27:'2nd Molar',28:'Wisdom Tooth',
+  31:'Central Incisor',32:'Lateral Incisor',33:'Canine',34:'1st Premolar',
+  35:'2nd Premolar',36:'1st Molar',37:'2nd Molar',38:'Wisdom Tooth',
+  41:'Central Incisor',42:'Lateral Incisor',43:'Canine',44:'1st Premolar',
+  45:'2nd Premolar',46:'1st Molar',47:'2nd Molar',48:'Wisdom Tooth',
+};
+
+/* state */
+var teeth={};
+var selFdi=null, selAll=false, selFdis=[];
+
+UPPER.concat(LOWER).forEach(function(f){
+  teeth[f]={cond:'sound',tx:'none',mob:'0',note:''};
+});
+
+/* demo */
+var DEMO={
+  16:{cond:'caries',tx:'crown_p',mob:'1',note:'MOD caries'},
+  21:{cond:'restored',tx:'composite',mob:'0',note:'Old composite'},
+  36:{cond:'missing',tx:'implant_p',mob:'0',note:'Extracted 2021'},
+  46:{cond:'caries',tx:'endo',mob:'2',note:'Pulpitis'},
+  11:{cond:'crown',tx:'pfm',mob:'0',note:'PFM intact'},
+  38:{cond:'unerupted',tx:'none',mob:'0',note:'Partially erupted'},
+  32:{cond:'watch',tx:'watch',mob:'0',note:'Early lesion'},
+  14:{cond:'restored',tx:'composite',mob:'0',note:''},
+  26:{cond:'crown',tx:'crown_p',mob:'0',note:''},
+};
+Object.keys(DEMO).forEach(function(k){
+  teeth[+k]=Object.assign({},teeth[+k],DEMO[k]);
+});
+
+/* ── Helpers ── */
+function condOf(k){return CONDS.find(function(c){return c.key===k;})||CONDS[0]}
+function isUpper(f){return f<30}
+
+/* ── TOOTH CANVAS DRAWING ──
+   Each tooth cell uses an HTML canvas.
+   Layout (from top): buccal view | small gap | occlusal view
+   For lower teeth the canvas is flipped: occlusal top, buccal bottom.
+*/
+
+/* colour palette for the enamel */
+var T={
+  enamel:'#dde5ef',   // crown body
+  enamelS:'#c8d4e4',  // crown shadow/outline
+  enamelH:'#f0f5fa',  // crown highlight
+  root:'#c4a46b',     // root body (amber/yellow like the reference)
+  rootD:'#a8875a',    // root shadow
+  rootH:'#e2c88a',    // root highlight
+  restoreD:'#d0d8e4', // restored outline
+};
+
+/* Dark mode swaps */
+function getThemeColors(){
+  var isDark=document.documentElement.getAttribute('data-theme')==='dark'||
+    (window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches&&
+      document.documentElement.getAttribute('data-theme')!=='light');
+  return {
+    enamel:  isDark?'#2a3a54':'#dde5ef',
+    enamelS: isDark?'#1e2e46':'#b8c8da',
+    enamelH: isDark?'#3a4e6e':'#f0f5fa',
+    root:    isDark?'#8b6832':'#c4a46b',
+    rootD:   isDark?'#6e5028':'#a8875a',
+    rootH:   isDark?'#b08840':'#e2c88a',
+  };
+}
+
+function toothShape(fdi){
+  var n=fdi%10;
+  if(n===1||n===2)return 'incisor';
+  if(n===3)return 'canine';
+  if(n===4||n===5)return 'premolar';
+  return 'molar';
+}
+
+/* draw on a 2x DPR canvas */
+function drawTooth(canvas, fdi, cond, W, buccalH, occH){
+  var dpr=window.devicePixelRatio||1;
+  var totalH=buccalH+4+occH;
+  canvas.width=W*dpr; canvas.height=totalH*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=totalH+'px';
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,totalH);
+
+  var upper=isUpper(fdi);
+  var shape=toothShape(fdi);
+  var tc=getThemeColors();
+  var condObj=condOf(cond);
+  var cc=condObj.color;
+  var isMissing=cond==='missing';
+  var isImplant=cond==='implant';
+
+  if(isMissing){
+    ctx.save();
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.2;
+    ctx.setLineDash([2,2]);
+    ctx.beginPath(); ctx.moveTo(W*0.25,4); ctx.lineTo(W*0.75,totalH-4);
+    ctx.moveTo(W*0.75,4); ctx.lineTo(W*0.25,totalH-4);
+    ctx.stroke(); ctx.restore();
+    return;
+  }
+
+  if(isImplant){
+    var iw=Math.round(W*0.28), ix=(W-iw)/2;
+    /* titanium screw */
+    ctx.save();
+    ctx.fillStyle=cc+'33'; ctx.strokeStyle=cc; ctx.lineWidth=1.2;
+    roundRect(ctx,ix,4,iw,totalH-16,3); ctx.fill(); ctx.stroke();
+    /* threads */
+    ctx.strokeStyle=cc; ctx.lineWidth=0.8;
+    for(var ty=10;ty<totalH-20;ty+=5){
+      ctx.beginPath(); ctx.moveTo(ix-3,ty); ctx.lineTo(ix+iw+3,ty); ctx.stroke();
+    }
+    /* abutment */
+    var aw=Math.round(W*0.42), ax=(W-aw)/2;
+    ctx.fillStyle=cc+'44'; ctx.strokeStyle=cc; ctx.lineWidth=1.2;
+    roundRect(ctx,ax,totalH-18,aw,10,3); ctx.fill(); ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  /* ─ buccal / facial view ─ */
+  if(upper){
+    drawBuccal(ctx,fdi,shape,0,W,buccalH,cond,tc,cc);
+  } else {
+    /* lower: occlusal on top */
+    drawOcclusal(ctx,fdi,shape,0,W,occH,cond,tc,cc);
+    /* separator */
+    ctx.save(); ctx.strokeStyle=tc.enamelS; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(4,occH+2); ctx.lineTo(W-4,occH+2); ctx.stroke(); ctx.restore();
+    drawBuccal(ctx,fdi,shape,occH+4,W,buccalH,cond,tc,cc);
+  }
+
+  /* ─ gap ─ */
+  if(upper){
+    ctx.save(); ctx.strokeStyle=tc.enamelS+'80'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(4,buccalH+2); ctx.lineTo(W-4,buccalH+2); ctx.stroke(); ctx.restore();
+  }
+
+  /* ─ occlusal view ─ */
+  if(upper){
+    drawOcclusal(ctx,fdi,shape,buccalH+4,W,occH,cond,tc,cc);
+  }
+}
+
+/* Buccal (side) view */
+function drawBuccal(ctx,fdi,shape,yOff,W,H,cond,tc,cc){
+  ctx.save();
+  var upper=isUpper(fdi);
+  var cx=W/2;
+
+  /* root */
+  var rootCol=tc.root, rootDark=tc.rootD, rootLight=tc.rootH;
+  var enamelCol=condEnamel(cond,tc,cc);
+  var enamelStroke=condStroke(cond,tc,cc);
+
+  if(shape==='incisor'){
+    var rootW=7, rootBase=upper?(yOff+H*0.50):(yOff+H*0.50);
+    var rootTip=upper?(yOff+4):(yOff+H-4);
+    var crownTop=upper?(yOff+H*0.44):(yOff+H*0.08);
+    var crownBot=upper?(yOff+H-2):(yOff+H*0.52);
+    var crownW=10;
+
+    /* root */
+    var rg=ctx.createLinearGradient(cx-rootW,0,cx+rootW,0);
+    rg.addColorStop(0,rootDark); rg.addColorStop(0.3,rootLight); rg.addColorStop(1,rootDark);
+    ctx.fillStyle=rg;
+    ctx.beginPath();
+    if(upper){
+      ctx.moveTo(cx-rootW/2,rootBase);
+      ctx.quadraticCurveTo(cx-rootW/2-1,rootBase*0.6+rootTip*0.4,cx,rootTip);
+      ctx.quadraticCurveTo(cx+rootW/2+1,rootBase*0.6+rootTip*0.4,cx+rootW/2,rootBase);
+    } else {
+      ctx.moveTo(cx-rootW/2,rootBase);
+      ctx.quadraticCurveTo(cx-rootW/2-1,rootBase*0.6+rootTip*0.4,cx,rootTip);
+      ctx.quadraticCurveTo(cx+rootW/2+1,rootBase*0.6+rootTip*0.4,cx+rootW/2,rootBase);
+    }
+    ctx.closePath(); ctx.fill();
+
+    /* crown */
+    var cg=ctx.createLinearGradient(cx-crownW,0,cx+crownW,0);
+    cg.addColorStop(0,tc.enamelS); cg.addColorStop(0.25,tc.enamelH); cg.addColorStop(0.7,enamelCol); cg.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=cg; ctx.strokeStyle=enamelStroke; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(cx-crownW,crownBot);
+    ctx.lineTo(cx-crownW,crownTop+4);
+    ctx.quadraticCurveTo(cx-crownW,crownTop,cx-crownW+4,crownTop);
+    ctx.lineTo(cx+crownW-4,crownTop);
+    ctx.quadraticCurveTo(cx+crownW,crownTop,cx+crownW,crownTop+4);
+    ctx.lineTo(cx+crownW,crownBot);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    /* caries overlay */
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'bb';
+      ctx.beginPath();
+      ctx.ellipse(cx+2,upper?crownBot-5:crownTop+5,4,3,0,0,Math.PI*2);
+      ctx.fill();
+    }
+
+  } else if(shape==='canine'){
+    var rBase=upper?(yOff+H*0.48):(yOff+H*0.52);
+    var rTip=upper?(yOff+3):(yOff+H-3);
+    var cTop=upper?(yOff+H*0.40):(yOff+H*0.12);
+    var cBot=upper?(yOff+H-2):(yOff+H*0.55);
+    var cW=9;
+
+    var rg=ctx.createLinearGradient(cx-8,0,cx+8,0);
+    rg.addColorStop(0,rootDark); rg.addColorStop(0.4,rootLight); rg.addColorStop(1,rootDark);
+    ctx.fillStyle=rg;
+    ctx.beginPath();
+    if(upper){
+      ctx.moveTo(cx-4,rBase); ctx.quadraticCurveTo(cx-5,rBase*0.5+rTip*0.5,cx,rTip);
+      ctx.quadraticCurveTo(cx+5,rBase*0.5+rTip*0.5,cx+4,rBase);
+    } else {
+      ctx.moveTo(cx-4,rBase); ctx.quadraticCurveTo(cx-5,rBase*0.5+rTip*0.5,cx,rTip);
+      ctx.quadraticCurveTo(cx+5,rBase*0.5+rTip*0.5,cx+4,rBase);
+    }
+    ctx.closePath(); ctx.fill();
+
+    var cg=ctx.createLinearGradient(cx-cW,0,cx+cW,0);
+    cg.addColorStop(0,tc.enamelS); cg.addColorStop(0.3,tc.enamelH); cg.addColorStop(0.7,enamelCol); cg.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=cg; ctx.strokeStyle=enamelStroke; ctx.lineWidth=1;
+
+    /* pointed cusp crown */
+    ctx.beginPath();
+    ctx.moveTo(cx-cW,cBot);
+    ctx.lineTo(cx-cW,cTop+8);
+    ctx.quadraticCurveTo(cx-cW+2,cTop+2,cx,cTop);
+    ctx.quadraticCurveTo(cx+cW-2,cTop+2,cx+cW,cTop+8);
+    ctx.lineTo(cx+cW,cBot);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'bb';
+      ctx.beginPath(); ctx.ellipse(cx+3,upper?cBot-4:cTop+4,3,2.5,0,0,Math.PI*2); ctx.fill();
+    }
+
+  } else if(shape==='premolar'){
+    /* two roots */
+    var rY=upper?(yOff+H*0.46):(yOff+H*0.54);
+    var rTipY=upper?(yOff+4):(yOff+H-4);
+    var rg=ctx.createLinearGradient(cx-8,0,cx+8,0);
+    rg.addColorStop(0,rootDark); rg.addColorStop(0.5,rootLight); rg.addColorStop(1,rootDark);
+    ctx.fillStyle=rg;
+
+    [-4,4].forEach(function(off){
+      ctx.beginPath();
+      if(upper){
+        ctx.moveTo(cx+off-3,rY); ctx.quadraticCurveTo(cx+off-2,rY*0.5+rTipY*0.5,cx+off,rTipY);
+        ctx.quadraticCurveTo(cx+off+2,rY*0.5+rTipY*0.5,cx+off+3,rY);
+      } else {
+        ctx.moveTo(cx+off-3,rY); ctx.quadraticCurveTo(cx+off-2,rY*0.5+rTipY*0.5,cx+off,rTipY);
+        ctx.quadraticCurveTo(cx+off+2,rY*0.5+rTipY*0.5,cx+off+3,rY);
+      }
+      ctx.closePath(); ctx.fill();
+    });
+
+    /* two-cusp crown */
+    var cTop=upper?(yOff+H*0.38):(yOff+H*0.10);
+    var cBot=upper?(yOff+H-2):(yOff+H*0.55);
+    var cW=11;
+    var cg=ctx.createLinearGradient(cx-cW,0,cx+cW,0);
+    cg.addColorStop(0,tc.enamelS); cg.addColorStop(0.25,tc.enamelH); cg.addColorStop(0.75,enamelCol); cg.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=cg; ctx.strokeStyle=enamelStroke; ctx.lineWidth=1;
+
+    var cuspMid=upper?(cTop+6):(cTop+3);
+    ctx.beginPath();
+    ctx.moveTo(cx-cW,cBot);
+    ctx.lineTo(cx-cW,cuspMid+4);
+    /* two cusps */
+    ctx.quadraticCurveTo(cx-cW+1,cuspMid,cx-3,cTop);
+    ctx.quadraticCurveTo(cx,cTop+3,cx+3,cTop);
+    ctx.quadraticCurveTo(cx+cW-1,cuspMid,cx+cW,cuspMid+4);
+    ctx.lineTo(cx+cW,cBot);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    /* central groove */
+    ctx.save(); ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.7; ctx.globalAlpha=0.4;
+    ctx.beginPath(); ctx.moveTo(cx,cTop+6); ctx.lineTo(cx,cBot-2); ctx.stroke();
+    ctx.restore();
+
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'bb';
+      ctx.beginPath(); ctx.ellipse(cx,upper?cBot-4:cTop+4,4,2.5,0,0,Math.PI*2); ctx.fill();
+    }
+
+  } else { /* molar */
+    /* 3 roots */
+    var rY=upper?(yOff+H*0.44):(yOff+H*0.56);
+    var rTipY=upper?(yOff+4):(yOff+H-4);
+    var rg=ctx.createLinearGradient(cx-14,0,cx+14,0);
+    rg.addColorStop(0,rootDark); rg.addColorStop(0.5,rootLight); rg.addColorStop(1,rootDark);
+    ctx.fillStyle=rg;
+
+    [-7,0,7].forEach(function(off){
+      ctx.beginPath();
+      if(upper){
+        ctx.moveTo(cx+off-3.5,rY); ctx.quadraticCurveTo(cx+off-2,rY*0.5+rTipY*0.5,cx+off,rTipY);
+        ctx.quadraticCurveTo(cx+off+2,rY*0.5+rTipY*0.5,cx+off+3.5,rY);
+      } else {
+        ctx.moveTo(cx+off-3.5,rY); ctx.quadraticCurveTo(cx+off-2,rY*0.5+rTipY*0.5,cx+off,rTipY);
+        ctx.quadraticCurveTo(cx+off+2,rY*0.5+rTipY*0.5,cx+off+3.5,rY);
+      }
+      ctx.closePath(); ctx.fill();
+    });
+
+    /* crown with 4 cusps */
+    var cTop=upper?(yOff+H*0.36):(yOff+H*0.08);
+    var cBot=upper?(yOff+H-1):(yOff+H*0.58);
+    var cW=14;
+    var cg=ctx.createLinearGradient(cx-cW,0,cx+cW,0);
+    cg.addColorStop(0,tc.enamelS); cg.addColorStop(0.2,tc.enamelH); cg.addColorStop(0.7,enamelCol); cg.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=cg; ctx.strokeStyle=enamelStroke; ctx.lineWidth=1;
+
+    var cuspY=upper?(cTop+7):(cTop+3);
+    var cuspYr=upper?(cTop+5):(cTop+5);
+    ctx.beginPath();
+    ctx.moveTo(cx-cW,cBot);
+    ctx.lineTo(cx-cW,cuspY+3);
+    ctx.quadraticCurveTo(cx-cW+1,cuspY,cx-9,cTop+2);
+    ctx.quadraticCurveTo(cx-5,cTop,cx-2,cTop+3);
+    ctx.quadraticCurveTo(cx+1,cTop,cx+5,cTop);
+    ctx.quadraticCurveTo(cx+cW-1,cuspYr,cx+cW,cuspYr+4);
+    ctx.lineTo(cx+cW,cBot);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    /* fissures */
+    ctx.save(); ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.7; ctx.globalAlpha=0.4;
+    if(cond!=='crown'){
+      var fy=upper?cBot-8:cTop+8;
+      ctx.beginPath(); ctx.moveTo(cx-4,cTop+10); ctx.quadraticCurveTo(cx,fy,cx+4,cTop+10); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-8,cTop+12); ctx.lineTo(cx+8,cTop+12); ctx.stroke();
+    }
+    ctx.restore();
+
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'cc';
+      ctx.beginPath(); ctx.ellipse(cx-4,upper?cBot-6:cTop+6,4,3.5,0,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  /* crown overlay for 'crown' condition */
+  if(cond==='crown'){
+    ctx.save();
+    ctx.fillStyle=cc+'22'; ctx.strokeStyle=cc; ctx.lineWidth=1.5;
+    /* just a colored border on top of the crown area */
+    var crTop=upper?(yOff+H*0.36):(yOff+H*0.08);
+    var crBot=upper?(yOff+H-1):(yOff+H*0.58);
+    var crW=shape==='molar'?14:(shape==='premolar'?11:(shape==='canine'?9:10));
+    ctx.beginPath();
+    roundRect(ctx,cx-crW,crTop,crW*2,crBot-crTop,4);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* watch dot */
+  if(cond==='watch'){
+    ctx.save(); ctx.fillStyle=cc;
+    ctx.beginPath(); ctx.arc(cx+shape==='molar'?10:8,upper?(yOff+H-6):(yOff+6),3.5,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/* Occlusal (top-down) view */
+function drawOcclusal(ctx,fdi,shape,yOff,W,H,cond,tc,cc){
+  ctx.save();
+  var cx=W/2, cy=yOff+H/2;
+  var isMissing=cond==='missing';
+  if(isMissing){ctx.restore();return;}
+
+  var enamelCol=condEnamel(cond,tc,cc);
+  var enamelStroke=condStroke(cond,tc,cc);
+
+  if(shape==='incisor'||shape==='canine'){
+    /* small oval */
+    var rw=shape==='canine'?8:7, rh=H*0.38;
+    var og=ctx.createRadialGradient(cx-1,cy-1,0,cx,cy,rw+2);
+    og.addColorStop(0,tc.enamelH); og.addColorStop(0.6,enamelCol); og.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=og; ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.ellipse(cx,cy,rw,rh,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+
+    /* lingual ridge for canine */
+    if(shape==='canine'){
+      ctx.save(); ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.6; ctx.globalAlpha=0.5;
+      ctx.beginPath(); ctx.moveTo(cx,cy-rh+3); ctx.lineTo(cx,cy+rh-3); ctx.stroke();
+      ctx.restore();
+    }
+
+  } else if(shape==='premolar'){
+    /* rounded rectangle occlusal */
+    var pw=11, ph=H*0.42;
+    var og=ctx.createRadialGradient(cx,cy,0,cx,cy,pw+3);
+    og.addColorStop(0,tc.enamelH); og.addColorStop(0.5,enamelCol); og.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=og; ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.9;
+    ctx.beginPath(); roundRect(ctx,cx-pw,cy-ph,pw*2,ph*2,5); ctx.fill(); ctx.stroke();
+
+    /* central fossa */
+    if(cond!=='crown'){
+      ctx.save(); ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.6; ctx.globalAlpha=0.5;
+      ctx.beginPath(); ctx.moveTo(cx,cy-ph+4); ctx.lineTo(cx,cy+ph-4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-pw+4,cy); ctx.lineTo(cx+pw-4,cy); ctx.stroke();
+      ctx.restore();
+    }
+
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'99'; ctx.beginPath();
+      ctx.ellipse(cx,cy,3.5,2.5,0,0,Math.PI*2); ctx.fill();
+    }
+
+  } else { /* molar */
+    /* larger rounded rect */
+    var mw=14, mh=H*0.45;
+    var og=ctx.createRadialGradient(cx,cy,0,cx,cy,mw+3);
+    og.addColorStop(0,tc.enamelH); og.addColorStop(0.5,enamelCol); og.addColorStop(1,tc.enamelS);
+    ctx.fillStyle=og; ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.9;
+    ctx.beginPath(); roundRect(ctx,cx-mw,cy-mh,mw*2,mh*2,6); ctx.fill(); ctx.stroke();
+
+    /* cusps & fissures */
+    if(cond!=='crown'){
+      ctx.save(); ctx.strokeStyle=enamelStroke; ctx.lineWidth=0.7; ctx.globalAlpha=0.45;
+      /* cross fissure */
+      ctx.beginPath(); ctx.moveTo(cx,cy-mh+4); ctx.lineTo(cx,cy+mh-4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-mw+4,cy); ctx.lineTo(cx+mw-4,cy); ctx.stroke();
+      /* cusp dots */
+      [[-6,-mh*0.5],[6,-mh*0.5],[-6,mh*0.5],[6,mh*0.5]].forEach(function(p){
+        ctx.beginPath(); ctx.arc(cx+p[0],cy+p[1],1.8,0,Math.PI*2); ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    if(cond==='caries'){
+      ctx.fillStyle=cc+'99'; ctx.beginPath();
+      ctx.ellipse(cx-3,cy,4,3,0,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+
+/* helpers */
+function condEnamel(cond,tc,cc){
+  if(cond==='crown') return cc+'44';
+  if(cond==='restored') return '#c8d4e4';
+  if(cond==='unerupted') return tc.enamelS;
+  return tc.enamel;
+}
+function condStroke(cond,tc,cc){
+  if(cond==='crown'||cond==='caries') return cc;
+  return tc.enamelS;
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+}
+
+/* build canvas for a tooth — returns canvas element */
+function makeToothCanvas(fdi,cond){
+  var shape=toothShape(fdi);
+  var isMolar=shape==='molar', isPremolar=shape==='premolar';
+  var W=isMolar?42:(isPremolar?38:36);
+  var bH=isMolar?42:(isPremolar?40:40);
+  var oH=isMolar?18:(isPremolar?16:13);
+
+  var c=document.createElement('canvas');
+  drawTooth(c,fdi,cond,W,bH,oH);
+  c.style.width=W+'px';
+  return c;
+}
+
+/* ── Build cells ── */
+function buildCell(fdi,arch){
+  var t=teeth[fdi];
+  var cell=document.createElement('div');
+  cell.className='tooth-cell'; cell.id='tc-'+fdi; cell.dataset.fdi=fdi;
+
+  var wrap=document.createElement('div');
+  wrap.className='tooth-canvas-wrap'; wrap.id='cw-'+fdi;
+  var cv=makeToothCanvas(fdi,t.cond);
+  wrap.appendChild(cv);
+
+  var pip=document.createElement('div');
+  pip.className='cond-pip'+(t.cond!=='sound'?' show':'');
+  pip.id='pip-'+fdi;
+  pip.style.background=condOf(t.cond).color;
+
+  var num=document.createElement('div');
+  num.className='fdi-num'; num.textContent=fdi;
+
+  if(arch==='upper'){
+    cell.appendChild(wrap); cell.appendChild(pip); cell.appendChild(num);
+  } else {
+    cell.appendChild(num); cell.appendChild(pip); cell.appendChild(wrap);
+  }
+
+  cell.addEventListener('click',function(){selectTooth(fdi);});
+  return cell;
+}
+
+/* ── refresh single tooth ── */
+function refreshCell(fdi){
+  var wrap=document.getElementById('cw-'+fdi);
+  if(wrap){
+    wrap.innerHTML='';
+    wrap.appendChild(makeToothCanvas(fdi,teeth[fdi].cond));
+  }
+  var pip=document.getElementById('pip-'+fdi);
+  if(pip){
+    pip.style.background=condOf(teeth[fdi].cond).color;
+    pip.className='cond-pip'+(teeth[fdi].cond!=='sound'?' show':'');
+  }
+}
+
+/* ── render arches ── */
+function renderArches(){
+  var uR=document.getElementById('upper-row');
+  var lR=document.getElementById('lower-row');
+  uR.innerHTML=''; lR.innerHTML='';
+  UPPER.forEach(function(f){uR.appendChild(buildCell(f,'upper'));});
+  LOWER.forEach(function(f){lR.appendChild(buildCell(f,'lower'));});
+}
+
+/* ── side panel builders ── */
+function buildCondGrid(){
+  var g=document.getElementById('condGrid'); g.innerHTML='';
+  CONDS.forEach(function(c){
+    var b=document.createElement('button');
+    b.className='cond-btn'; b.dataset.cond=c.key;
+    b.innerHTML='<span class="pip" style="background:'+c.color+'"></span>'+c.label;
+    b.addEventListener('click',function(){
+      var fdis=selAll?selFdis:(selFdi?[selFdi]:[]);
+      if(!fdis.length)return;
+      fdis.forEach(function(f){teeth[f].cond=c.key; refreshCell(f);});
+      syncCondUI(); updateStats();
+      if(!selAll&&selFdi) redrawHero();
+    });
+    g.appendChild(b);
   });
-  ['dragleave','drop'].forEach(function(ev){
-    dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('drag');});
+}
+
+function syncCondUI(){
+  var fdis=selAll?selFdis:(selFdi?[selFdi]:[]);
+  var cur=fdis.length===1?teeth[fdis[0]].cond:(fdis.length>1?'__multi':null);
+  document.querySelectorAll('.cond-btn').forEach(function(b){
+    var active=b.dataset.cond===cur;
+    b.classList.toggle('active',active);
+    var cc=condOf(cur);
+    b.style.background=active?cc.color+'18':'';
+    b.style.borderColor=active?cc.color:'';
+    b.style.color=active?cc.color:'';
   });
-  dz.addEventListener('drop',function(e){
-    var f=e.dataTransfer.files[0]; if(f) handleFile(f);
+  if(selFdi){
+    var c=condOf(teeth[selFdi].cond);
+    document.getElementById('heroBadge').innerHTML=
+      '<span class="cond-badge" style="background:'+c.color+'18;color:'+c.color+'">'+c.label+'</span>';
+  }
+}
+
+function buildTxGrid(){
+  var w=document.getElementById('txWrap'); w.innerHTML='';
+  TXS.forEach(function(t){
+    var c=document.createElement('button');
+    c.className='tx-chip'; c.dataset.tx=t.key; c.textContent=t.label;
+    c.addEventListener('click',function(){
+      var fdis=selAll?selFdis:(selFdi?[selFdi]:[]);
+      fdis.forEach(function(f){teeth[f].tx=t.key;});
+      syncTxUI();
+    });
+    w.appendChild(c);
+  });
+}
+function syncTxUI(){
+  var cur=selFdi?teeth[selFdi].tx:null;
+  document.querySelectorAll('.tx-chip').forEach(function(c){c.classList.toggle('on',c.dataset.tx===cur);});
+}
+
+function buildMobRow(){
+  var r=document.getElementById('mobRow'); r.innerHTML='';
+  ['0','1','2','3'].forEach(function(m){
+    var b=document.createElement('button');
+    b.className='mob-btn'; b.dataset.mob=m; b.textContent=m;
+    b.addEventListener('click',function(){
+      if(!selFdi)return;
+      teeth[selFdi].mob=m; syncMobUI();
+    });
+    r.appendChild(b);
+  });
+}
+function syncMobUI(){
+  var cur=selFdi?teeth[selFdi].mob:null;
+  document.querySelectorAll('.mob-btn').forEach(function(b){b.classList.toggle('on',b.dataset.mob===cur);});
+}
+
+document.getElementById('noteBox').addEventListener('input',function(){
+  if(selFdi)teeth[selFdi].note=this.value;
+});
+
+/* ── hero ── */
+function redrawHero(){
+  if(!selFdi)return;
+  var wrap=document.getElementById('heroWrap'); wrap.innerHTML='';
+  var shape=toothShape(selFdi);
+  var isMolar=shape==='molar', isPremolar=shape==='premolar';
+  var W=isMolar?52:(isPremolar?46:42);
+  var bH=isMolar?50:(isPremolar?48:46);
+  var oH=isMolar?22:(isPremolar?18:15);
+  var c=document.createElement('canvas');
+  drawTooth(c,selFdi,teeth[selFdi].cond,W,bH,oH);
+  c.style.width=W+'px'; c.style.height=(bH+4+oH)+'px';
+  wrap.appendChild(c);
+  wrap.style.width=W+'px'; wrap.style.height=(bH+4+oH)+'px';
+}
+
+/* ── select tooth ── */
+function selectTooth(fdi){
+  if(selAll)return;
+  if(selFdi){
+    var p=document.getElementById('tc-'+selFdi);
+    if(p)p.classList.remove('selected');
+  }
+  selFdi=fdi;
+  var cell=document.getElementById('tc-'+fdi);
+  if(cell)cell.classList.add('selected');
+
+  document.getElementById('sideEmpty').style.display='none';
+  document.getElementById('sideDetail').classList.add('active');
+  document.getElementById('sideActions').style.display='';
+
+  document.getElementById('heroFdi').textContent=fdi;
+  document.getElementById('heroName').textContent=(isUpper(fdi)?'Upper ':'Lower ')+NAMES[fdi];
+  redrawHero();
+  syncCondUI(); syncTxUI(); syncMobUI();
+  document.getElementById('noteBox').value=teeth[fdi].note||'';
+}
+
+/* ── select all ── */
+document.getElementById('selAllWrap').addEventListener('click',function(){
+  selAll=!selAll;
+  document.getElementById('selAllToggle').classList.toggle('on',selAll);
+  if(selAll){
+    selFdis=UPPER.concat(LOWER); selFdi=null;
+    document.querySelectorAll('.tooth-cell').forEach(function(c){
+      c.classList.remove('selected'); if(selAll)c.classList.add('selected');
+    });
+    document.getElementById('sideEmpty').style.display='none';
+    document.getElementById('sideDetail').classList.add('active');
+    document.getElementById('sideActions').style.display='';
+    document.getElementById('heroFdi').textContent='ALL';
+    document.getElementById('heroName').textContent='32 teeth selected';
+    document.getElementById('heroBadge').innerHTML=
+      '<span class="cond-badge" style="background:var(--accent-dim);color:var(--accent)">Bulk Edit</span>';
+    document.getElementById('heroWrap').innerHTML='';
+  } else {
+    selFdis=[];
+    document.querySelectorAll('.tooth-cell').forEach(function(c){c.classList.remove('selected');});
+    document.getElementById('sideEmpty').style.display='';
+    document.getElementById('sideDetail').classList.remove('active');
+    document.getElementById('sideActions').style.display='none';
+  }
+  syncCondUI(); syncTxUI();
+});
+
+/* apply & next */
+document.getElementById('btnNext').addEventListener('click',function(){
+  if(selAll)return;
+  var all=UPPER.concat(LOWER), idx=all.indexOf(selFdi);
+  if(idx<all.length-1)selectTooth(all[idx+1]);
+});
+
+/* reset */
+document.getElementById('btnReset').addEventListener('click',function(){
+  if(!confirm('Reset all teeth to sound?'))return;
+  UPPER.concat(LOWER).forEach(function(f){
+    teeth[f]={cond:'sound',tx:'none',mob:'0',note:''};
+    refreshCell(f);
+  });
+  document.querySelectorAll('.tooth-cell').forEach(function(c){c.classList.remove('selected');});
+  selFdi=null; selAll=false;
+  document.getElementById('selAllToggle').classList.remove('on');
+  document.getElementById('sideEmpty').style.display='';
+  document.getElementById('sideDetail').classList.remove('active');
+  document.getElementById('sideActions').style.display='none';
+  updateStats();
+});
+
+/* stats */
+function updateStats(){
+  var counts={};
+  CONDS.forEach(function(c){counts[c.key]=0;});
+  UPPER.concat(LOWER).forEach(function(f){counts[teeth[f].cond]=(counts[teeth[f].cond]||0)+1;});
+  var bar=document.getElementById('statsbar'); bar.innerHTML='';
+  var lbl=document.createElement('span');
+  lbl.style.cssText='font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-right:4px';
+  lbl.textContent='Summary'; bar.appendChild(lbl);
+  CONDS.forEach(function(c){
+    if(!counts[c.key])return;
+    var el=document.createElement('div'); el.className='stat';
+    el.innerHTML='<div class="stat-dot" style="background:'+c.color+'"></div>'
+      +'<span class="stat-n">'+counts[c.key]+'</span>'
+      +'<span class="stat-l">'+c.label+'</span>';
+    bar.appendChild(el);
+  });
+}
+
+/* legend */
+function buildLegend(){
+  var row=document.getElementById('legend');
+  CONDS.forEach(function(c){
+    var el=document.createElement('div'); el.className='legend-item';
+    el.innerHTML='<div class="legend-swatch" style="background:'+c.color+'"></div>'+c.label;
+    row.appendChild(el);
+  });
+}
+
+/* ── Bubble postMessage Bridge ── */
+
+// Helper: build full JSON of all 32 teeth
+function getChartJSON(){
+  var out={};
+  UPPER.concat(LOWER).forEach(function(f){
+    var t=teeth[f];
+    out[f]={cond:t.cond,tx:t.tx,mob:t.mob||'0',note:t.note||''};
+  });
+  return JSON.stringify(out);
+}
+
+// Helper: post stats to parent
+function postStats(){
+  var c={sound:0,caries:0,missing:0,planned:0};
+  UPPER.concat(LOWER).forEach(function(f){
+    var t=teeth[f];
+    if(t.cond==='sound')   c.sound++;
+    if(t.cond==='caries')  c.caries++;
+    if(t.cond==='missing') c.missing++;
+    if(t.tx&&t.tx!=='none')c.planned++;
+  });
+  try{window.parent.postMessage({type:'dc:stats',sound:c.sound,caries:c.caries,missing:c.missing,planned:c.planned},'*');}catch(ex){}
+}
+
+// Helper: notify parent of a tooth's current state
+function notifyTooth(fdi){
+  var t=teeth[fdi];
+  var upper=isUpper(fdi);
+  var quad=upper?(fdi<20?1:2):(fdi>=40?4:3);
+  try{window.parent.postMessage({type:'dc:tooth',fdi:fdi,
+    name:(upper?'Upper ':'Lower ')+(NAMES[fdi]||''),
+    cond:t.cond,tx:t.tx,mob:t.mob||'0',note:t.note||'',
+    arch:upper?'upper':'lower',quad:quad},'*');}catch(ex){}
+  postStats();
+}
+
+// Override selectTooth so parent gets notified on every click
+var _origSelectTooth=selectTooth;
+selectTooth=function(fdi){
+  _origSelectTooth(fdi);
+  var t=teeth[fdi];
+  var upper=isUpper(fdi);
+  var quad=upper?(fdi<20?1:2):(fdi>=40?4:3);
+  try{window.parent.postMessage({type:'dc:select',fdi:fdi,
+    name:(upper?'Upper ':'Lower ')+(NAMES[fdi]||''),
+    cond:t.cond,tx:t.tx,mob:t.mob||'0',note:t.note||'',
+    arch:upper?'upper':'lower',quad:quad},'*');}catch(ex){}
+};
+
+// Override condition buttons to fire notifyTooth after every change
+(function patchCondButtons(){
+  document.querySelectorAll('.cond-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var fdis=selAll?selFdis:(selFdi?[selFdi]:[]);
+      fdis.forEach(function(f){notifyTooth(f);});
+    });
   });
 })();
 
-/* ── postMessage bridge (Bubble iframe integration) ── */
+/* save — posts JSON to Bubble AND still shows modal when standalone */
+document.getElementById('btnSave').addEventListener('click',function(){
+  var json=getChartJSON();
+  // Send to Bubble parent
+  try{window.parent.postMessage({type:'dc:save',json:json},'*');}catch(ex){}
+  // Also show visual modal when opened standalone (not in iframe)
+  if(window.self===window.top){
+    var pretty=JSON.stringify(JSON.parse(json),null,2);
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;display:flex;align-items:center;justify-content:center;padding:20px';
+    ov.innerHTML='<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;max-width:480px;width:100%;max-height:80vh;overflow:auto">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+      +'<h3 style="font-size:13px;font-weight:600">JSON Export</h3>'
+      +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">×</button>'
+      +'</div>'
+      +'<pre style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px;font-family:JetBrains Mono,monospace;font-size:11.5px;overflow:auto;white-space:pre-wrap;color:var(--text-secondary)">'+pretty+'</pre>'
+      +'</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  }
+});
+
+// Listen for commands FROM Bubble
 window.addEventListener('message',function(e){
-  var d=e.data; if(!d||!d.type) return;
+  var d=e.data;
+  if(!d||typeof d.type!=='string')return;
 
-  if(d.type==='dv:setState'&&d.teeth){
-    S.teeth=d.teeth; applyAll(); updStats(); updCount();
-    emitStats();
-  }
-  if(d.type==='dv:setTooth'&&d.fdi){
-    if(!S.teeth[d.fdi])S.teeth[d.fdi]={};
-    var t=S.teeth[d.fdi];
-    if(d.cond)t.cond=d.cond; if(d.tx)t.tx=d.tx;
-    if(d.note!=null)t.note=d.note; if(d.mob)t.mob=d.mob;
-    applyOne(d.fdi); updStats(); updCount(); emitStats();
-  }
-  if(d.type==='dv:selectTooth'&&d.fdi&&TEETH[d.fdi]) selTooth(d.fdi);
-  if(d.type==='dv:clearSel') clearSel();
-  if(d.type==='dv:setBA'&&d.value!=null){ S.ba=d.value; $('ba-range').value=d.value; onBA(d.value); }
-  if(d.type==='dv:camGo'&&d.view) camGo(d.view);
-  if(d.type==='dv:setPanel'){
-    var panel=$('panel'); if(panel) panel.style.display=d.visible===false?'none':'';
-  }
-  if(d.type==='dv:resetAll') resetAll();
-});
-
-/* Emit helpers — send state back to Bubble parent */
-function emitStats(){
-  var vs=Object.values(S.teeth);
-  try{ parent.postMessage({
-    type:'dv:stats',
-    sound: Math.max(0,32-vs.filter(function(t){return t.cond==='caries';}).length-vs.filter(function(t){return t.cond==='missing';}).length),
-    caries:  vs.filter(function(t){return t.cond==='caries';}).length,
-    missing: vs.filter(function(t){return t.cond==='missing';}).length,
-    planned: vs.filter(function(t){return t.tx&&t.tx!=='none';}).length
-  },'*'); }catch(e){}
-}
-
-/* ── demo seed ── */
-function seed(){
-  S.teeth[16]={cond:'caries',tx:'crown_p',mob:'1',note:'MOD caries to pulp. Full coverage crown.'};
-  S.teeth[26]={cond:'crown',tx:'none'};
-  S.teeth[36]={cond:'missing',tx:'implant_p',note:'Long-standing edentulous site.'};
-  S.teeth[46]={cond:'caries',tx:'endo',note:'Irreversible pulpitis. RCT before crown.'};
-  S.teeth[14]={cond:'restored',tx:'none'};
-  S.teeth[24]={cond:'caries',tx:'composite',note:'Small mesial lesion.'};
-  S.teeth[25]={cond:'sound',tx:'veneer'};
-  S.teeth[11]={cond:'sound',tx:'veneer'};
-  S.teeth[21]={cond:'sound',tx:'veneer'};
-  S.surfs[16]={b:'hit',o:'hit',m:'hit'};
-  S.surfs[46]={b:'hit',o:'hit'};
-  updStats(); updCount();
-}
-
-/* ── automatic hosted model loader ── */
-function autoLoadModel(){
-  var prog=$('ld-prog'), bar=$('ld-bar'), msg=$('ld-msg');
-
-  if(prog) prog.style.display='block';
-  if(bar) bar.style.width='15%';
-  if(msg) msg.textContent='Loading dental model…';
-
-  fetch('./teeth_library.glb')
-    .then(function(response){
-      if(!response.ok){
-        throw new Error('Could not load teeth_library.glb ('+response.status+')');
-      }
-
-      if(bar) bar.style.width='45%';
-      return response.arrayBuffer();
-    })
-    .then(function(buffer){
-      if(bar) bar.style.width='60%';
-      loadGLB(buffer,'teeth_library.glb');
-    })
-    .catch(function(err){
-      console.error('Automatic model load failed:',err);
-      if(msg) msg.textContent='❌ Automatic model load failed — use Load Model to select the GLB.';
-      if(bar) bar.style.width='0%';
+  if(d.type==='dc:setState'){
+    var inc=d.teeth||{};
+    Object.keys(inc).forEach(function(k){
+      var fdi=parseInt(k);
+      if(teeth[fdi]){Object.assign(teeth[fdi],inc[k]);refreshCell(fdi);}
     });
-}
-
-/* ══════════════════════════════════════════════════════════
-   VISIT STAGES — Phase manager (real, editable)
-══════════════════════════════════════════════════════════ */
-function defaultPhases(){
-  return [
-    {id:1,title:'Examination & Records',status:'completed',date:'',notes:'Charting, radiographs, photographs.',teeth:[]},
-    {id:2,title:'Extractions',status:'notstarted',date:'',notes:'',teeth:ALL.filter(function(f){return S.teeth[f]&&S.teeth[f].tx==='extraction';})},
-    {id:3,title:'Restorations & RCT',status:'notstarted',date:'',notes:'',teeth:ALL.filter(function(f){return S.teeth[f]&&['composite','crown_p','pfm','veneer','endo'].indexOf(S.teeth[f].tx)>-1;})},
-    {id:4,title:'Implant Surgery',status:'notstarted',date:'',notes:'',teeth:ALL.filter(function(f){return S.teeth[f]&&S.teeth[f].tx==='implant_p';})},
-    {id:5,title:'Final Delivery',status:'notstarted',date:'',notes:'Crown seating, occlusal check, polish.',teeth:[]}
-  ];
-}
-var phaseSeq=6;
-window.addPhase=function(){
-  S.phases.push({id:phaseSeq++,title:'New Phase',status:'notstarted',date:'',notes:'',teeth:[]});
-  renderPhases();
-  logActivity(null,null,null,null,null,'Added phase "New Phase"');
-};
-window.removePhase=function(id){
-  S.phases=S.phases.filter(function(p){return p.id!==id;});
-  renderPhases();
-};
-window.updatePhaseField=function(id,field,val){
-  var p=S.phases.find(function(x){return x.id===id;}); if(!p) return;
-  p[field]=val;
-  if(field==='status'||field==='title') renderPhases();
-};
-window.addToothToPhase=function(id,sel){
-  var fdi=parseInt(sel.value); if(!fdi) return;
-  var p=S.phases.find(function(x){return x.id===id;}); if(!p) return;
-  if(p.teeth.indexOf(fdi)===-1) p.teeth.push(fdi);
-  sel.value='';
-  renderPhases();
-};
-window.removeToothFromPhase=function(id,fdi){
-  var p=S.phases.find(function(x){return x.id===id;}); if(!p) return;
-  p.teeth=p.teeth.filter(function(f){return f!==fdi;});
-  renderPhases();
-};
-window.jumpToTooth=function(fdi){ selTooth(fdi); };
-
-function renderPhases(){
-  var el=$('phase-list'); if(!el) return;
-  var statusLabels={notstarted:'Not started',inprogress:'In progress',completed:'Completed'};
-  el.innerHTML=S.phases.map(function(p,i){
-    var toothOpts=ALL.filter(function(f){return p.teeth.indexOf(f)===-1;})
-      .map(function(f){return '<option value="'+f+'">'+f+' — '+(NAMES[f]||'')+'</option>';}).join('');
-    var chips=p.teeth.map(function(f){
-      return '<span class="pchip" onclick="jumpToTooth('+f+')">'+f
-        +'<button onclick="event.stopPropagation();removeToothFromPhase('+p.id+','+f+')">✕</button></span>';
-    }).join('') || '<span style="font-size:10px;color:var(--t4)">No teeth assigned</span>';
-    return '<div class="phase-card">'
-      +'<div class="phase-hd">'
-        +'<div class="phase-num">'+(i+1)+'</div>'
-        +'<input class="phase-title-inp" value="'+p.title.replace(/"/g,'&quot;')+'" onchange="updatePhaseField('+p.id+',\'title\',this.value)">'
-        +'<button class="phase-del" onclick="removePhase('+p.id+')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
-      +'</div>'
-      +'<div class="phase-body">'
-        +'<div class="phase-row">'
-          +'<select class="phase-status" onchange="updatePhaseField('+p.id+',\'status\',this.value)">'
-            +['notstarted','inprogress','completed'].map(function(s){return '<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+statusLabels[s]+'</option>';}).join('')
-          +'</select>'
-          +'<input class="phase-date" type="text" placeholder="Visit date" value="'+(p.date||'').replace(/"/g,'&quot;')+'" onchange="updatePhaseField('+p.id+',\'date\',this.value)">'
-        +'</div>'
-        +'<textarea class="phase-notes" placeholder="Notes for this phase…" onchange="updatePhaseField('+p.id+',\'notes\',this.value)">'+(p.notes||'')+'</textarea>'
-        +'<div class="phase-teeth-lbl">Assigned teeth <span class="status-pill status-'+p.status+'">'+statusLabels[p.status]+'</span></div>'
-        +'<div class="phase-teeth">'+chips+'</div>'
-        +'<div class="phase-add-tooth"><select onchange="if(this.value)addToothToPhase('+p.id+',this)"><option value="">+ add tooth…</option>'+toothOpts+'</select></div>'
-      +'</div>'
-    +'</div>';
-  }).join('');
-}
-
-/* ══════════════════════════════════════════════════════════
-   BEFORE / AFTER — Compare view + snapshot capture
-══════════════════════════════════════════════════════════ */
-function renderCompare(){
-  var changed=ALL.filter(function(f){var t=S.teeth[f]; return t&&t.tx&&t.tx!=='none';});
-  text('cmp-total',String(changed.length));
-  text('cmp-pct',S.ba+'%');
-  var el=$('cmp-list'); if(!el) return;
-  if(!changed.length){
-    el.innerHTML='<div class="cmp-empty">No treatments planned yet.<br>Select teeth in Treatment Plan to add proposed care.</div>';
-    return;
+    updateStats();postStats();
   }
-  el.innerHTML=changed.map(function(f){
-    var t=S.teeth[f];
-    return '<div class="cmp-row" onclick="jumpToTooth('+f+')">'
-      +'<span class="cmp-fdi">'+f+'</span>'
-      +'<span class="cmp-arrow"><span class="cmp-from">'+(t.cond||'sound')+'</span><span class="cmp-sep">→</span><span class="cmp-to">'+t.tx.replace(/_p/,'').replace(/_/,' ')+'</span></span>'
-    +'</div>';
-  }).join('');
-}
-window.captureSnapshot=function(){
-  if(!rnd) return;
-  try{
-    var url=rnd.domElement.toDataURL('image/png');
-    var a=document.createElement('a');
-    a.href=url; a.download='dentaviz-comparison-'+S.ba+'pct.png';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }catch(e){ console.warn('[DentaViz] snapshot failed',e); }
-};
 
-/* ══════════════════════════════════════════════════════════
-   PATIENT VIEW — friendly, read-only
-══════════════════════════════════════════════════════════ */
-var FRIENDLY_COND={sound:'healthy',caries:'has some decay',restored:'has an existing filling',crown:'has an existing crown',missing:'is missing',implant:'has an implant',unerupted:'has not come in yet'};
-var FRIENDLY_TX={none:'',composite:'a tooth-coloured filling',crown_p:'a porcelain crown',pfm:'a crown',extraction:'removal',implant_p:'an implant and crown',veneer:'a veneer',endo:'a root canal treatment',bridge:'a bridge',watch:'monitoring at your next visit'};
-function renderPatientSummary(){
-  var vs=Object.values(S.teeth);
-  var attention=ALL.filter(function(f){var t=S.teeth[f]; return t&&((t.cond&&t.cond!=='sound')||(t.tx&&t.tx!=='none'));}).length;
-  text('pv-healthy',String(32-attention));
-  text('pv-attention',String(attention));
-}
-function renderPatientTooth(f){
-  var s=S.teeth[f]||{cond:'sound',tx:'none'};
-  var name=NAMES[f]||'tooth';
-  var condTxt=FRIENDLY_COND[s.cond||'sound']||'healthy';
-  var txTxt=FRIENDLY_TX[s.tx||'none']||'';
-  var sentence='Your '+name.toLowerCase()+' (tooth #'+f+') is '+condTxt+'.';
-  if(txTxt) sentence+=' Your dentist has recommended '+txTxt+' for this tooth.';
-  else if((s.cond||'sound')==='sound') sentence+=' No treatment is needed right now.';
-  text('pv-intro','');
-  var el=$('pv-content'); if(!el) return;
-  el.innerHTML='<div class="pv-card"><div class="pv-fdi">'+f+'</div><div class="pv-name">'+name+'</div><div class="pv-text">'+sentence+'</div></div>'
-    +'<div class="sec-title" style="margin:0 14px 8px">All your teeth</div>'
-    +'<div class="pv-legend-item"><div class="pv-legend-sw" style="background:#e8e2d5"></div><div class="pv-legend-t">Healthy tooth</div></div>'
-    +'<div class="pv-legend-item"><div class="pv-legend-sw" style="background:#6b2b0d"></div><div class="pv-legend-t">Needs treatment (decay)</div></div>'
-    +'<div class="pv-legend-item"><div class="pv-legend-sw" style="background:#4f8ff7"></div><div class="pv-legend-t">Treatment being planned</div></div>'
-    +'<div class="pv-legend-item"><div class="pv-legend-sw" style="background:#181e2c;border:1px dashed #3d4e68"></div><div class="pv-legend-t">Missing tooth</div></div>';
-}
-
-/* ══════════════════════════════════════════════════════════
-   CLINICAL ADVISORIES — simple intelligence layer
-══════════════════════════════════════════════════════════ */
-function computeAdvisories(){
-  var out=[];
-  ALL.forEach(function(f){
-    var s=S.teeth[f]; if(!s) return;
-    if(s.cond==='missing'&&(!s.tx||['implant_p','bridge'].indexOf(s.tx)===-1)){
-      out.push({sev:'warn',fdi:f,text:'Tooth <b>'+f+'</b> is missing with no replacement planned — consider implant or bridge.'});
+  if(d.type==='dc:setTooth'){
+    var fdi=parseInt(d.fdi);
+    if(teeth[fdi]){
+      if(d.cond!==undefined)teeth[fdi].cond=d.cond;
+      if(d.tx!==undefined)  teeth[fdi].tx=d.tx;
+      if(d.mob!==undefined) teeth[fdi].mob=d.mob;
+      if(d.note!==undefined)teeth[fdi].note=d.note;
+      refreshCell(fdi);
+      if(selFdi===fdi){syncCondUI();syncTxUI();syncMobUI();redrawHero();}
+      updateStats();notifyTooth(fdi);
     }
-    if(s.tx==='extraction'){
-      out.push({sev:'info',fdi:f,text:'Tooth <b>'+f+'</b> is planned for extraction — consider a replacement plan after healing.'});
-    }
-    if(s.cond==='sound'&&s.tx==='extraction'){
-      out.push({sev:'warn',fdi:f,text:'Tooth <b>'+f+'</b> is marked sound but extraction is planned — please verify.'});
-    }
-  });
-  /* Adjacent-to-missing drift risk */
-  ALL.forEach(function(f){
-    var s=S.teeth[f];
-    if(s&&s.cond==='missing'&&(!s.tx||s.tx==='none')){
-      adjacentOf(f).forEach(function(adj){
-        out.push({sev:'info',fdi:adj,text:'Tooth <b>'+adj+'</b> is adjacent to missing tooth '+f+' — monitor for drift.'});
-      });
-    }
-  });
-  return out;
-}
-function renderAdvisories(){
-  var el=$('advisory-list'); if(!el) return;
-  var adv=computeAdvisories();
-  if(!adv.length){ el.innerHTML='<div class="adv-empty">No advisories — plan looks consistent.</div>'; return; }
-  el.innerHTML=adv.map(function(a){
-    var ic=a.sev==='warn'
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
-    return '<div class="adv-card adv-'+a.sev+'" onclick="jumpToTooth('+a.fdi+')"><span class="adv-ic">'+ic+'</span><span class="adv-txt">'+a.text+'</span></div>';
-  }).join('');
-}
-
-/* ══════════════════════════════════════════════════════════
-   FILTERED TEETH — stat card drill-down
-══════════════════════════════════════════════════════════ */
-window.filterTeeth=function(type){
-  S.filter=type;
-  var labels={sound:'Sound teeth',caries:'Caries',planned:'Planned treatment',missing:'Missing teeth'};
-  text('filt-title',labels[type]||'Filtered');
-  show('filt-section');
-  renderFilteredChips();
-};
-window.clearFilter=function(){ S.filter=null; hide('filt-section'); };
-function renderFilteredChips(){
-  if(!S.filter) return;
-  var matches=ALL.filter(function(f){
-    var s=S.teeth[f]||{cond:'sound'};
-    if(S.filter==='sound') return (s.cond||'sound')==='sound';
-    if(S.filter==='caries') return s.cond==='caries';
-    if(S.filter==='planned') return s.tx&&s.tx!=='none';
-    if(S.filter==='missing') return s.cond==='missing';
-    return false;
-  });
-  var el=$('filt-chips'); if(!el) return;
-  el.innerHTML=matches.map(function(f){return '<span class="fchip" onclick="jumpToTooth('+f+')">'+f+'</span>';}).join('')
-    || '<span style="font-size:10.5px;color:var(--t4)">None</span>';
-}
-
-/* ══════════════════════════════════════════════════════════
-   RELATED TEETH — adjacency, opposing, bridge grouping
-══════════════════════════════════════════════════════════ */
-function renderRelated(f){
-  var adj=adjacentOf(f);
-  var adjEl=$('rel-adjacent');
-  if(adjEl) adjEl.innerHTML=adj.length
-    ? adj.map(function(a){return '<span class="rchip" onclick="jumpToTooth('+a+')">'+a+'</span>';}).join('')
-    : '<span class="rchip none">edge of arch</span>';
-
-  var opp=opposingOf(f);
-  var oppEl=$('rel-opposing');
-  if(oppEl) oppEl.innerHTML=opp?'<span class="rchip" onclick="jumpToTooth('+opp+')">'+opp+'</span>':'<span class="rchip none">—</span>';
-
-  var s=S.teeth[f]||{};
-  var bridgeRow=$('rel-bridge-row');
-  if(s.tx==='bridge'){
-    show2(bridgeRow);
-    var group=S.relations[f]&&S.relations[f].bridge||[];
-    var bEl=$('rel-bridge');
-    if(bEl){
-      var opts=adj.map(function(a){
-        var on=group.indexOf(a)>-1;
-        return '<span class="rchip'+(on?' on':'')+'" onclick="toggleBridgeMember('+f+','+a+')">'+a+'</span>';
-      }).join('');
-      bEl.innerHTML=opts||'<span class="rchip none">no adjacent teeth</span>';
-    }
-  } else if(bridgeRow){ bridgeRow.style.display='none'; }
-}
-function show2(el){ if(el) el.style.display='flex'; }
-window.toggleBridgeMember=function(f,a){
-  if(!S.relations[f]) S.relations[f]={bridge:[]};
-  var g=S.relations[f].bridge;
-  var idx=g.indexOf(a);
-  if(idx>-1) g.splice(idx,1); else g.push(a);
-  renderRelated(f);
-};
-
-/* ══════════════════════════════════════════════════════════
-   ACTIVITY LOG — audit trail
-══════════════════════════════════════════════════════════ */
-function logActivity(fdi,prevCond,prevTx,newCond,newTx,customTxt){
-  var txt;
-  if(customTxt){ txt=customTxt; }
-  else{
-    var parts=[];
-    if(prevCond!==newCond) parts.push('condition → <b>'+newCond+'</b>');
-    if(prevTx!==newTx) parts.push('treatment → <b>'+(newTx&&newTx!=='none'?newTx.replace(/_/,' '):'none')+'</b>');
-    txt='Tooth <b>'+fdi+'</b> updated: '+(parts.join(', ')||'note saved');
   }
-  S.activity.unshift({t:Date.now(),fdi:fdi,txt:txt});
-  if(S.activity.length>200) S.activity.length=200;
-}
-function relTime(ts){
-  var s=Math.floor((Date.now()-ts)/1000);
-  if(s<10) return 'just now';
-  if(s<60) return s+'s ago';
-  var m=Math.floor(s/60); if(m<60) return m+'m ago';
-  var h=Math.floor(m/60); if(h<24) return h+'h ago';
-  return Math.floor(h/24)+'d ago';
-}
-function renderActivity(){
-  var el=$('activity-list'); if(!el) return;
-  if(!S.activity.length){ el.innerHTML='<div class="act-empty">No changes recorded yet.<br>Every saved edit appears here.</div>'; return; }
-  el.innerHTML=S.activity.map(function(a){
-    return '<div class="act-item"'+(a.fdi?' onclick="jumpToTooth('+a.fdi+')"':'')+'>'
-      +'<span class="act-dot"></span>'
-      +'<div class="act-body"><div class="act-txt">'+a.txt+'</div><div class="act-time">'+relTime(a.t)+'</div></div>'
-    +'</div>';
-  }).join('');
-}
 
-/* ══════════════════════════════════════════════════════════
-   PATIENT INFO POPOVER
-══════════════════════════════════════════════════════════ */
-window.togglePatPop=function(e){
-  if(e) e.stopPropagation();
-  var pop=$('pat-pop'); if(!pop) return;
-  pop.style.display=(pop.style.display==='block')?'none':'block';
-};
-document.addEventListener('click',function(e){
-  var pop=$('pat-pop'); if(!pop||pop.style.display!=='block') return;
-  if(!pop.contains(e.target) && !e.target.closest('.pat-chip')) pop.style.display='none';
+  if(d.type==='dc:resetAll'){
+    UPPER.concat(LOWER).forEach(function(f){
+      teeth[f]={cond:'sound',tx:'none',mob:'0',note:''};refreshCell(f);
+    });
+    selFdi=null;selAll=false;
+    document.getElementById('selAllToggle').classList.remove('on');
+    document.querySelectorAll('.tooth-cell').forEach(function(c){c.classList.remove('selected');});
+    document.getElementById('sideEmpty').style.display='';
+    document.getElementById('sideDetail').classList.remove('active');
+    document.getElementById('sideActions').style.display='none';
+    updateStats();postStats();
+  }
+
+  if(d.type==='dc:selectTooth'){
+    var fdi=parseInt(d.fdi);
+    if(teeth[fdi])selectTooth(fdi);
+  }
+
+  if(d.type==='dc:clearSel'){
+    if(selFdi){var cell=document.getElementById('tc-'+selFdi);if(cell)cell.classList.remove('selected');selFdi=null;}
+    document.getElementById('sideEmpty').style.display='';
+    document.getElementById('sideDetail').classList.remove('active');
+    document.getElementById('sideActions').style.display='none';
+    try{window.parent.postMessage({type:'dc:clearSel'},'*');}catch(ex){}
+  }
+
+  if(d.type==='dc:setPanel'){
+    var s=document.querySelector('.side');
+    if(s)s.style.display=d.visible?'':'none';
+  }
+
+  if(d.type==='dc:setPatient'){
+    var pn=document.querySelector('.patient-pill .pname');
+    var pd=document.querySelector('.patient-pill .pdob');
+    if(pn&&d.name)pn.textContent=d.name;
+    if(pd&&d.dob) pd.textContent='DOB: '+d.dob;
+  }
+
+  if(d.type==='dc:setReadonly'){
+    document.querySelectorAll('.cond-btn,.tx-chip,.mob-btn,.note-box,.btn').forEach(function(el){
+      el.disabled=!!d.readonly;el.style.pointerEvents=d.readonly?'none':'';
+    });
+  }
+
+  if(d.type==='dc:getJSON'){
+    try{window.parent.postMessage({type:'dc:save',json:getChartJSON()},'*');}catch(ex){}
+  }
 });
-window.updatePatient=function(){
-  S.patient.name=$('pat-in-name').value||'Demo Patient';
-  S.patient.chart=$('pat-in-chart').value||'';
-  S.patient.dob=$('pat-in-dob').value||'';
-  text('pat-name-disp',S.patient.name);
-  text('pat-meta-disp',S.patient.chart?('Chart '+S.patient.chart):'No chart #');
-  var av=$('pat-av');
-  if(av){ var initials=S.patient.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase(); av.textContent=initials||'DP'; }
-};
 
-/* ── boot ── */
-function boot(){
-  if(typeof THREE==='undefined'){text('sb-main','❌ Three.js failed to load');return;}
-  if(typeof THREE.GLTFLoader==='undefined'){text('sb-main','❌ GLTFLoader failed — check network');return;}
-  if(typeof THREE.OrbitControls==='undefined'){text('sb-main','❌ OrbitControls failed — check network');return;}
-  initThree();
-  seed();
-  S.phases=defaultPhases();
-  updStats(); updCount();
-  buildStageList();
-  renderAdvisories();
-  autoLoadModel();
-  // Notify Bubble parent iframe that viewer is ready
-  setTimeout(function(){ try{ parent.postMessage({type:'dv:ready'},'*'); }catch(e){} }, 800);
+// Signal ready to Bubble (after DOM is built)
+try{window.parent.postMessage({type:'dc:ready'},'*');}catch(ex){}
+
+/* redraw on theme change */
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){
+    UPPER.concat(LOWER).forEach(function(f){refreshCell(f);});
+    if(selFdi)redrawHero();
+  });
 }
 
-if(document.readyState==='complete') boot();
-else window.addEventListener('load',boot);
+/* ── init ── */
+renderArches();
+buildCondGrid(); buildTxGrid(); buildMobRow();
+buildLegend(); updateStats();
+postStats();
+
+})();
 </script>
-</body>
-</html>
+
+</body></html>
